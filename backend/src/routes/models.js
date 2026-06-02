@@ -8,6 +8,16 @@ router.get('/', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+router.post('/', async (req, res) => {
+  try {
+    const { code, name } = req.body;
+    const { rows } = await pool.query(
+      'INSERT INTO models (code, name) VALUES ($1,$2) RETURNING *', [code, name]
+    );
+    res.json(rows[0]);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 router.get('/:modelId/parts', async (req, res) => {
   try {
     const { rows } = await pool.query(
