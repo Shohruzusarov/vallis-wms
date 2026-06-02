@@ -16,9 +16,9 @@ app.use('/api/qr',      require('./routes/qr'));
 app.get('/health', (req, res) => res.json({ status: 'ok', project: 'Vallis WMS' }));
 
 const PORT = process.env.PORT || 3001;
-initDB().then(() => {
-  app.listen(PORT, () => console.log(`Vallis WMS running on port ${PORT}`));
-}).catch(err => {
-  console.error('DB init failed:', err);
-  process.exit(1);
+app.listen(PORT, () => {
+  console.log(`Vallis WMS running on port ${PORT}`);
+  initDB()
+    .then(() => console.log('DB ready'))
+    .catch(err => console.error('DB error:', err.message));
 });
