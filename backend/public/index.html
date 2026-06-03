@@ -1021,7 +1021,9 @@
       if (!pendingPart) return;
       var qty = parseInt(document.getElementById('qp-input').value);
       if (!qty || qty < 1) { document.getElementById('qp-input').focus(); return; }
-      bCounts[pendingPart.part_code] = (bCounts[pendingPart.part_code] || 0) + qty;
+      var newCnt = (bCounts[pendingPart.part_code] || 0) + qty;
+if (newCnt > bTotal) { document.getElementById('qp-input').style.border = '2px solid #ef4444'; document.getElementById('qp-input').value = newCnt; alert('Лишних: ' + (newCnt - bTotal) + ' шт! Нужно ' + bTotal + ', взяли ' + newCnt); }
+bCounts[pendingPart.part_code] = newCnt;
       pendingPart = null;
       document.getElementById('qty-overlay').style.display = 'none';
       renderBatch();
