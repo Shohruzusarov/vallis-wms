@@ -140,13 +140,13 @@ async function selectShipment(id){
   const el=document.getElementById('order-list');
   if(!data.orders.length){el.innerHTML='<div class="empty">Нет позиций в поставке</div>';return;}
   el.innerHTML=data.orders.map(o=>{
-    const pct=o.total_kits>0?0:0;
     return '<div class="oi" onclick="selectOrder('+o.id+',''+o.model_name+'','+o.total_kits+',''+o.order_number+'','+o.model_id+')"><div style="display:flex;align-items:center;justify-content:space-between"><div class="on">'+o.model_name+'</div><span class="badge '+(o.status==="complete"?"bg":"by")+'">'+(o.status==="complete"?"Готов":"В работе")+'</span></div><div class="om">'+o.total_kits+' комплектов &middot; '+o.order_number+'</div></div>';
   }).join('');
 }
 
-function selectOrder(id,name,kits,num,modelId){
-  curOrder={id,model_name:name,total_kits:kits,order_number:num,model_id:modelId};
+async function selectOrder(id){
+  const data=await api('/api/shipments/'+curShip.id);
+  curOrder=data.orders.find(o=>o.id===id);
   showMode();
 }
 
