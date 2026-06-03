@@ -52,6 +52,7 @@ input:focus,select:focus{outline:none;border-color:var(--bl)}
 .batch-row:last-child{border-bottom:none}.bp{flex:1}.bn{font-size:14px;font-weight:500}.bc{font-size:11px;color:var(--mt);font-family:monospace}
 .bcount{display:flex;align-items:center;gap:6px}.bnum{font-size:18px;font-weight:700;min-width:28px;text-align:center}
 .bnum.done{color:var(--gn)}.bnum.over{color:var(--rd)}.bneed{font-size:11px;color:var(--mt)}
+.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;display:none;align-items:center;justify-content:center}.popup-overlay.show{display:flex}
 </style>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head><body>
@@ -249,75 +250,58 @@ function renderBatch(){
 async function onBatch(e){
   const code=e.target.value.trim();if(!code)return;e.target.value='';
   const part=bParts.find(p=>p.part_code===code);
-  if(part){
-    const cnt=(bCounts[code]||0)+1;bCounts[code]=cnt;
-    if(cnt<=bTotal)showR('batch-rb','r-ok','&#10003;',part.part_name,cnt+'/'+bTotal);
-    else showR('batch-rb','r-dup','!','&#1051;&#1048;&#1064;&#1053;&#1045;&#1045;',part.part_name+' — '+cnt+' &#1096;&#1090;, &#1085;&#1072;&#1076;&#1086; '+bTotal);
-    renderBatch();
-  }else{
-    showR('batch-rb','r-wrong','&#10005;','&#427987;&#1059;&#1046;&#1040;&#1071; &#1044;&#1045;&#1058;&#1040;&#1051;&#1068;','&#1050;&#1086;&#1076;: '+code);
+  if(!part){
+    showQtyPopup(null,code);
+    return;
   }
+  showQtyPopup(part,null);
+}
+
+let pendingPart=null;
+
+function showQtyPopup(part,unknownCode){
+  if(!part){
+    document.getElementById('qp-icon').textContent='❌';
+    document.getElementById('qp-name').textContent='Чужая деталь!';
+    document.getElementById('qp-code').textContent='Код: '+unknownCode+' — не входит в эту модель';
+    document.getElementById('qp-qty-section').style.display='none';
+    document.getElementById('qty-popup').classList.add('show');
+    document.getElementById('qty-popup').style.borderColor='var(--rd)';
+    return;
+  }
+  pendingPart=part;
+  const already=bCounts[part.part_code]||0;
+  const left=Math.max(0,bTotal-already);
+  document.getElementById('qp-icon').textContent=already>=bTotal?'✅':'📦';
+  document.getElementById('qp-name').textContent=part.part_name;
+  document.getElementById('qp-code').textContent=part.part_code+(already>0?' (уже: '+already+' шт)':'');
+  document.getElementById('qp-qty-section').style.display='block';
+  document.getElementById('qp-input').value=left||'';
+  document.getElementById('qp-input').placeholder='Нужно: '+bTotal;
+  const btns=[1,2,3,5,bTotal].filter((v,i,a)=>v>0&&a.indexOf(v)===i);
+  document.getElementById('qp-quick').innerHTML=btns.map(v=>'<button onclick="setQty('+v+')" style="padding:6px 14px;background:var(--sf);border:1px solid var(--br);border-radius:8px;font-size:13px;color:var(--tx);cursor:pointer">'+v+'</button>').join('');
+  document.getElementById('qty-popup').classList.add('show');
+  setTimeout(()=>document.getElementById('qp-input').focus(),150);
+}
+
+function setQty(v){document.getElementById('qp-input').value=v;}
+
+function confirmQty(){
+  if(!pendingPart)return;
+  const qty=parseInt(document.getElementById('qp-input').value);
+  if(!qty||qty<1){document.getElementById('qp-input').focus();return;}
+  bCounts[pendingPart.part_code]=(bCounts[pendingPart.part_code]||0)+qty;
+  const total=bCounts[pendingPart.part_code];
+  pendingPart=null;
+  document.getElementById('qty-popup').classList.remove('show');
+  renderBatch();
   setTimeout(()=>document.getElementById('batch-inp').focus(),100);
 }
 
-function showR(boxId,cls,icon,title,sub){
-  const b=document.getElementById(boxId);b.className='rb show '+cls;
-  const prefix=boxId==='scan-rb'?'sc':'bt';
-  document.getElementById(prefix+'-ri').textContent=icon;
-  document.getElementById(prefix+'-rt').textContent=title;
-  document.getElementById(prefix+'-rs').textContent=sub;
-  setTimeout(()=>b.classList.remove('show'),4000);
+function cancelQty(){
+  pendingPart=null;
+  document.getElementById('qty-popup').classList.remove('show');
+  setTimeout(()=>document.getElementById('batch-inp').focus(),100);
 }
 
-
-let cameras = {};
-
-async function toggleCamera(mode) {
-  const readerId = 'cam-reader-' + mode;
-  const btnId = 'cam-btn-' + mode;
-  const reader = document.getElementById(readerId);
-  const btn = document.getElementById(btnId);
-
-  if (cameras[mode]) {
-    await cameras[mode].stop();
-    cameras[mode] = null;
-    reader.style.display = 'none';
-    btn.textContent = '📷 Сканировать камерой';
-    return;
-  }
-
-  reader.style.display = 'block';
-  btn.textContent = '⏹ Остановить камеру';
-  reader.innerHTML = '';
-
-  const qr = new Html5Qrcode(readerId);
-  cameras[mode] = qr;
-
-  try {
-    await qr.start(
-      { facingMode: 'environment' },
-      { fps: 10, qrbox: { width: 250, height: 250 } },
-      async (code) => {
-        await qr.stop();
-        cameras[mode] = null;
-        reader.style.display = 'none';
-        btn.textContent = '📷 Сканировать камерой';
-        if (mode === 'scan') {
-          document.getElementById('scan-inp').value = code;
-          document.getElementById('scan-inp').dispatchEvent(new Event('change'));
-        } else {
-          document.getElementById('batch-inp').value = code;
-          document.getElementById('batch-inp').dispatchEvent(new Event('change'));
-        }
-      },
-      () => {}
-    );
-  } catch(e) {
-    reader.innerHTML = '<div style="padding:12px;color:#ef4444;font-size:13px">Ошибка камеры: ' + e + '</div>';
-    cameras[mode] = null;
-    btn.textContent = '📷 Сканировать камерой';
-  }
-}
-
-showShipments();
-</script></body></html>
+>
