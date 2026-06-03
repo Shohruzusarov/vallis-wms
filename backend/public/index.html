@@ -997,7 +997,7 @@
         document.getElementById('qp-code').textContent = 'Код: ' + unknownCode + ' не входит в эту модель';
         document.getElementById('qp-input').parentElement.style.display = 'none';
         document.getElementById('qp-quick').style.display = 'none';
-        document.getElementById('qty-overlay').style.display = 'flex';
+        var ov=document.getElementById('qty-overlay');ov.style.display='flex';ov.style.flexDirection='column';ov.style.justifyContent='flex-end';
         return;
       }
       pendingPart = part;
@@ -1011,7 +1011,7 @@
       document.getElementById('qp-input').value = left || '';
       var vals = [1, 2, 3, 5, bTotal].filter(function (v, i, a) { return v > 0 && a.indexOf(v) === i; });
       document.getElementById('qp-quick').innerHTML = vals.map(function (v) { return '<button onclick="setQty(' + v + ')" style="padding:12px 18px;background:#1a1d27;border:1px solid #2a2d3a;border-radius:10px;font-size:16px;color:#e8eaf0;cursor:pointer;min-width:52px">' + v + '</button>'; }).join('');
-      document.getElementById('qty-overlay').style.display = 'flex';
+      var ov=document.getElementById('qty-overlay');ov.style.display='flex';ov.style.flexDirection='column';ov.style.justifyContent='flex-end';
       setTimeout(function () { document.getElementById('qp-input').focus(); }, 150);
     }
 
