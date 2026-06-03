@@ -9,19 +9,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
-app.use('/api/models',  require('./routes/models'));
-app.use('/api/parts',   require('./routes/parts'));
-app.use('/api/orders',  require('./routes/orders'));
-app.use('/api/scan',    require('./routes/scan'));
-app.use('/api/reports', require('./routes/reports'));
-app.use('/api/qr',      require('./routes/qr'));
+app.use('/api/shipments', require('./routes/shipments'));
+app.use('/api/models',    require('./routes/models'));
+app.use('/api/parts',     require('./routes/parts'));
+app.use('/api/orders',    require('./routes/orders'));
+app.use('/api/scan',      require('./routes/scan'));
+app.use('/api/reports',   require('./routes/reports'));
+app.use('/api/qr',        require('./routes/qr'));
 
 app.get('/health', (req, res) => res.json({ status: 'ok', project: 'Vallis WMS' }));
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log('Vallis WMS running on port ' + PORT);
-  initDB()
-    .then(() => console.log('DB ready'))
-    .catch(err => console.error('DB error:', err.message));
+  initDB().then(() => console.log('DB ready')).catch(err => console.error('DB error:', err.message));
 });
