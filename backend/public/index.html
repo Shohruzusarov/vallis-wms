@@ -174,7 +174,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,sans-serif;m
 
 <div class="overlay" id="qty-overlay" onclick="event.target===this&&cancelQty()">
   <div class="popup" id="qty-popup">
-    <div class="popup-icon" id="qp-icon">&#128230;</div>
+    <div id="qp-icon" style="font-size:32px;font-weight:700;color:var(--gn);margin-bottom:8px">+</div>
     <div class="popup-name" id="qp-name"></div>
     <div class="popup-code" id="qp-code"></div>
     <div class="popup-label">Сколько штук взяли?</div>
@@ -360,7 +360,7 @@ function goS6(){
     bParts=parts; bTotal=curOrd.total_kits; bCounts={};
     parts.forEach(function(p){bCounts[p.part_code]=0;});
     document.getElementById('s6-title').textContent='&#128290; '+curOrd.model_name;
-    document.getElementById('s6-sub').textContent=curShip.client_name+' · '+curOrd.total_kits+' &#1082;&#1086;&#1084;&#1087;&#1083;.';
+    document.getElementById('s6-sub').textContent=curShip.client_name+' · '+curOrd.total_kits+' kompл.';
     renderBatch();
     document.getElementById('s6-done').classList.remove('show');
     var inp=document.getElementById('s6-inp');
@@ -401,7 +401,7 @@ function onScanBatch(e){
 
 function showQtyPopup(part, unknownCode){
   if(!part){
-    document.getElementById('qp-icon').textContent='&#10060;';
+    document.getElementById('qp-icon').textContent='!';
     document.getElementById('qp-name').textContent='&#1063;&#1091;&#1078;&#1072;&#1103; &#1076;&#1077;&#1090;&#1072;&#1083;&#1100;!';
     document.getElementById('qp-code').textContent='&#1050;&#1086;&#1076;: '+unknownCode+' &#1085;&#1077; &#1074;&#1093;&#1086;&#1076;&#1080;&#1090; &#1074; &#1101;&#1090;&#1091; &#1084;&#1086;&#1076;&#1077;&#1083;&#1100;';
     document.getElementById('qp-input').parentElement.style.display='none';
@@ -412,7 +412,7 @@ function showQtyPopup(part, unknownCode){
   pendingPart=part;
   var already=bCounts[part.part_code]||0;
   var left=Math.max(0, bTotal-already);
-  document.getElementById('qp-icon').textContent=already>=bTotal?'&#9989;':'&#128230;';
+  document.getElementById('qp-icon').textContent=already>=bTotal?'OK':'+';
   document.getElementById('qp-name').textContent=part.part_name;
   document.getElementById('qp-code').textContent=part.part_code+(already>0?' (&#1091;&#1078;&#1077;: '+already+')':'');
   document.getElementById('qp-input').parentElement.style.display='flex';
