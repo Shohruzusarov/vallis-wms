@@ -172,17 +172,15 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,sans-serif;m
   </div>
 </div>
 
-<div class="overlay" id="qty-overlay" onclick="event.target===this&&cancelQty()">
-  <div class="popup" id="qty-popup">
-    <div id="qp-icon" style="font-size:32px;font-weight:700;color:var(--gn);margin-bottom:8px">+</div>
+<div class="overlay" id="qty-overlay">
+  <div class="popup" id="qty-popup" style="width:320px">
+    <div id="qp-icon" style="font-size:28px;font-weight:700;color:var(--gn);margin-bottom:8px">+</div>
     <div class="popup-name" id="qp-name"></div>
     <div class="popup-code" id="qp-code"></div>
-    <div class="popup-label">Сколько штук взяли?</div>
-    <div class="popup-qty">
-      <input id="qp-input" type="number" min="1" placeholder="0" onkeydown="if(event.key==='Enter')confirmQty()">
-      <button class="popup-confirm" onclick="confirmQty()">&#10003;</button>
-    </div>
-    <div class="quick-btns" id="qp-quick"></div>
+    <div class="popup-label" style="margin-top:12px">Сколько штук взяли?</div>
+    <input id="qp-input" type="number" min="1" placeholder="0" onkeydown="if(event.key==='Enter')confirmQty()" style="width:100%;font-size:28px;font-weight:700;text-align:center;padding:12px;margin:8px 0;background:var(--bg);border:2px solid var(--bl);border-radius:10px;color:var(--tx)">
+    <div class="quick-btns" id="qp-quick" style="margin-bottom:12px"></div>
+    <button onclick="confirmQty()" style="width:100%;padding:14px;background:var(--gn);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:8px">&#10003; Принять</button>
     <button class="popup-cancel" onclick="cancelQty()">Отмена</button>
   </div>
 </div>
@@ -359,7 +357,7 @@ function goS6(){
   api('/api/models/'+curOrd.model_id+'/parts').then(function(parts){
     bParts=parts; bTotal=curOrd.total_kits; bCounts={};
     parts.forEach(function(p){bCounts[p.part_code]=0;});
-    document.getElementById('s6-title').textContent='&#128290; '+curOrd.model_name;
+    document.getElementById('s6-title').textContent='[D] '+curOrd.model_name;
     document.getElementById('s6-sub').textContent=curShip.client_name+' · '+curOrd.total_kits+' kompл.';
     renderBatch();
     document.getElementById('s6-done').classList.remove('show');
