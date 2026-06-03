@@ -172,23 +172,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,sans-serif;m
   </div>
 </div>
 
-<div id="qty-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;display:none;flex-direction:column;justify-content:flex-end">
-  <div style="background:var(--sf);border-radius:20px 20px 0 0;border-top:2px solid var(--gn);padding:24px 20px 40px;width:100%">
-    <div style="width:40px;height:4px;background:var(--br);border-radius:2px;margin:0 auto 20px"></div>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-      <div id="qp-icon" style="font-size:20px;font-weight:700;color:var(--gn);width:36px;height:36px;background:var(--gbg);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">+</div>
-      <div>
-        <div id="qp-name" style="font-size:16px;font-weight:700;color:var(--tx)"></div>
-        <div id="qp-code" style="font-size:11px;color:var(--mt);font-family:monospace;margin-top:2px"></div>
-      </div>
-    </div>
-    <div style="font-size:14px;color:var(--mt);margin-bottom:8px;text-align:center">Сколько штук взяли?</div>
-    <input id="qp-input" type="number" min="1" placeholder="0" inputmode="numeric" onkeydown="if(event.key==='Enter')confirmQty()" style="width:100%;font-size:36px;font-weight:700;text-align:center;padding:14px;margin-bottom:12px;background:var(--bg);border:2px solid var(--bl);border-radius:12px;color:var(--tx);-webkit-appearance:none">
-    <div id="qp-quick" style="display:flex;gap:8px;justify-content:center;margin-bottom:16px"></div>
-    <button onclick="confirmQty()" style="width:100%;padding:16px;background:var(--gn);color:#fff;border:none;border-radius:14px;font-size:18px;font-weight:700;cursor:pointer;margin-bottom:10px">&#10003;&nbsp;&nbsp;Принять</button>
-    <button onclick="cancelQty()" style="width:100%;padding:13px;background:transparent;color:var(--mt);border:1px solid var(--br);border-radius:12px;font-size:15px;cursor:pointer">Отмена</button>
-  </div>
-</div>
+<div id="qty-overlay" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:9999;display:none;flex-direction:column;justify-content:flex-end"><div style="background:#1a1d27;border-radius:20px 20px 0 0;border-top:2px solid #22c55e;padding:20px 16px 40px"><div style="width:40px;height:4px;background:#2a2d3a;border-radius:2px;margin:0 auto 20px"></div><div style="display:flex;align-items:center;gap:12px;margin-bottom:20px"><div id="qp-icon" style="width:44px;height:44px;border-radius:12px;background:#052e16;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">+</div><div style="min-width:0;flex:1"><div id="qp-name" style="font-size:17px;font-weight:700;color:#e8eaf0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div><div id="qp-code" style="font-size:12px;color:#6b7280;font-family:monospace;margin-top:2px"></div></div></div><div style="font-size:13px;color:#6b7280;margin-bottom:10px;text-align:center">Skolko shtuk vzyali?</div><input id="qp-input" type="number" min="1" inputmode="numeric" placeholder="0" onkeydown="if(event.key==='Enter')confirmQty()" style="display:block;width:100%;font-size:52px;font-weight:700;text-align:center;padding:52px 14px;background:#0f1117;border:2px solid #3b82f6;border-radius:12px;color:#e8eaf0;margin-bottom:14px;-webkit-appearance:none;appearance:none"><div id="qp-quick" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px"></div><button onclick="confirmQty()" style="display:block;width:100%;padding:18px;background:#22c55e;color:#fff;border:none;border-radius:14px;font-size:19px;font-weight:700;cursor:pointer;margin-bottom:10px">Prinyat</button><button onclick="cancelQty()" style="display:block;width:100%;padding:14px;background:transparent;color:#6b7280;border:1px solid #2a2d3a;border-radius:12px;font-size:15px;cursor:pointer">Otmena</button></div></div>
 
 <script>
 var curShip=null, curOrd=null, curKit=null, curParts=[];
@@ -422,9 +406,7 @@ function showQtyPopup(part, unknownCode){
   document.getElementById('qp-quick').style.display='flex';
   document.getElementById('qp-input').value=left||'';
   var vals=[1,2,3,5,bTotal].filter(function(v,i,a){return v>0&&a.indexOf(v)===i;});
-  document.getElementById('qp-quick').innerHTML=vals.map(function(v){
-    return '<button class="quick-btn" onclick="setQty('+v+')">'+v+'</button>';
-  }).join('');
+  document.getElementById('qp-quick').innerHTML=vals.map(function(v){return '<button onclick="setQty('+v+')" style="padding:12px 18px;background:#1a1d27;border:1px solid #2a2d3a;border-radius:10px;font-size:16px;color:#e8eaf0;cursor:pointer;min-width:52px">'+v+'</button>';}).join('');
   document.getElementById('qty-overlay').style.display='flex';
   setTimeout(function(){document.getElementById('qp-input').focus();}, 150);
 }
