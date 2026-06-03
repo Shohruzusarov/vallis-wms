@@ -1052,8 +1052,7 @@ function editBatch(partCode) {
     } function finishBatch() {
       var hasOver = bParts.some(function(p){ return (bCounts[p.part_code]||0) > bTotal; });
       if (hasOver) { alert('Есть лишние детали! Исправьте перед завершением.'); return; }
-      alert('Сборка завершена! Заказ ' + curOrd.order_number + ' готов к погрузке.');
-      goS2();
+      api('/api/orders/' + curOrd.id + '/complete', 'POST', {}).then(function(){ alert('Заказ ' + curOrd.order_number + ' готов к погрузке!'); goS2(); });
     }
 
     var camInstances = {};
