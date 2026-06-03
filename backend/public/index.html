@@ -342,12 +342,12 @@ function onScanKit(e){
     } else if(res.result==='wrong'){
       box.className='result show res-wrong';
       document.getElementById('s5-ri').textContent='&#10005;';
-      document.getElementById('s5-rt').textContent='&#1063;&#1091;&#1078;&#1072;&#1103; &#1076;&#1077;&#1090;&#1072;&#1083;&#1100;!';
+      document.getElementById('s5-rt').textContent='Чужая деталь!';
       document.getElementById('s5-rs').textContent=res.message;
     } else {
       box.className='result show res-dup';
       document.getElementById('s5-ri').textContent='!';
-      document.getElementById('s5-rt').textContent='&#1044;&#1091;&#1073;&#1083;&#1080;&#1082;&#1072;&#1090;';
+      document.getElementById('s5-rt').textContent='Дубликат';
       document.getElementById('s5-rs').textContent=res.message;
     }
     setTimeout(function(){box.classList.remove('show');}, 4000);
@@ -402,8 +402,8 @@ function onScanBatch(e){
 function showQtyPopup(part, unknownCode){
   if(!part){
     document.getElementById('qp-icon').textContent='!';
-    document.getElementById('qp-name').textContent='&#1063;&#1091;&#1078;&#1072;&#1103; &#1076;&#1077;&#1090;&#1072;&#1083;&#1100;!';
-    document.getElementById('qp-code').textContent='&#1050;&#1086;&#1076;: '+unknownCode+' &#1085;&#1077; &#1074;&#1093;&#1086;&#1076;&#1080;&#1090; &#1074; &#1101;&#1090;&#1091; &#1084;&#1086;&#1076;&#1077;&#1083;&#1100;';
+    document.getElementById('qp-name').textContent='Чужая деталь!';
+    document.getElementById('qp-code').textContent='Код: '+unknownCode+' не входит в эту модель';
     document.getElementById('qp-input').parentElement.style.display='none';
     document.getElementById('qp-quick').style.display='none';
     document.getElementById('qty-overlay').classList.add('show');
@@ -414,7 +414,7 @@ function showQtyPopup(part, unknownCode){
   var left=Math.max(0, bTotal-already);
   document.getElementById('qp-icon').textContent=already>=bTotal?'OK':'+';
   document.getElementById('qp-name').textContent=part.part_name;
-  document.getElementById('qp-code').textContent=part.part_code+(already>0?' (&#1091;&#1078;&#1077;: '+already+')':'');
+  document.getElementById('qp-code').textContent=part.part_code+(already>0?' (уже: '+already+')':'');
   document.getElementById('qp-input').parentElement.style.display='flex';
   document.getElementById('qp-quick').style.display='flex';
   document.getElementById('qp-input').value=left||'';
