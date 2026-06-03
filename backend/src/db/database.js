@@ -1,53 +1,14 @@
 const { Pool } = require('pg');
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-});
+const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false });
 
 async function initDB() {
   await pool.query(`
-    CREATE TABLE IF NOT EXISTS models (
-      id SERIAL PRIMARY KEY,
-      code VARCHAR(50) UNIQUE NOT NULL,
-      name VARCHAR(200) NOT NULL,
-      created_at TIMESTAMP DEFAULT NOW()
-    );
-
-    CREATE TABLE IF NOT EXISTS parts (
-      id SERIAL PRIMARY KEY,
-      model_id INTEGER REFERENCES models(id),
-      part_code VARCHAR(100) UNIQUE NOT NULL,
-      part_name VARCHAR(200) NOT NULL,
-      quantity_per_kit INTEGER DEFAULT 1
-    );
-
-    CREATE TABLE IF NOT EXISTS orders (
-      id SERIAL PRIMARY KEY,
-      order_number VARCHAR(100) UNIQUE NOT NULL,
-      model_id INTEGER REFERENCES models(id),
-      total_kits INTEGER NOT NULL,
-      status VARCHAR(50) DEFAULT 'in_progress',
-      created_at TIMESTAMP DEFAULT NOW()
-    );
-
-    CREATE TABLE IF NOT EXISTS order_kits (
-      id SERIAL PRIMARY KEY,
-      order_id INTEGER REFERENCES orders(id),
-      kit_number INTEGER NOT NULL,
-      status VARCHAR(50) DEFAULT 'incomplete',
-      completed_at TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS scan_logs (
-      id SERIAL PRIMARY KEY,
-      kit_id INTEGER REFERENCES order_kits(id),
-      part_code VARCHAR(100) NOT NULL,
-      scanned_part_name VARCHAR(200),
-      result VARCHAR(50) NOT NULL,
-      message TEXT,
-      scanned_at TIMESTAMP DEFAULT NOW()
-    );
+    CREATE TABLE IF NOT EXISTS models (id SERIAL PRIMARY KEY, code VARCHAR(50) UNIQUE NOT NULL, name VARCHAR(200) NOT NULL, created_at TIMESTAMP DEFAULT NOW());
+    CREATE TABLE IF NOT EXISTS parts (id SERIAL PRIMARY KEY, model_id INTEGER REFERENCES models(id), part_code VARCHAR(100) UNIQUE NOT NULL, part_name VARCHAR(200) NOT NULL, quantity_per_kit INTEGER DEFAULT 1);
+    CREATE TABLE IF NOT EXISTS shipments (id SERIAL PRIMARY KEY, shipment_number VARCHAR(100) UNIQUE NOT NULL, client_name VARCHAR(200) NOT NULL, status VARCHAR(50) DEFAULT 'in_progress', notes TEXT, created_at TIMESTAMP DEFAULT NOW());
+    CREATE TABLE IF NOT EXISTS orders (id SERIAL PRIMARY KEY, shipment_id INTEGER REFERENCES shipments(id), order_number VARCHAR(100) UNIQUE NOT NULL, model_id INTEGER REFERENCES models(id), total_kits INTEGER NOT NULL, status VARCHAR(50) DEFAULT 'in_progress', created_at TIMESTAMP DEFAULT NOW());
+    CREATE TABLE IF NOT EXISTS order_kits (id SERIAL PRIMARY KEY, order_id INTEGER REFERENCES orders(id), kit_number INTEGER NOT NULL, status VARCHAR(50) DEFAULT 'incomplete', completed_at TIMESTAMP);
+    CREATE TABLE IF NOT EXISTS scan_logs (id SERIAL PRIMARY KEY, kit_id INTEGER REFERENCES order_kits(id), part_code VARCHAR(100) NOT NULL, scanned_part_name VARCHAR(200), result VARCHAR(50) NOT NULL, message TEXT, scanned_at TIMESTAMP DEFAULT NOW());
 
     INSERT INTO models (code, name) VALUES
       ('DC001F24', 'Душевая кабина DC-001F24'),
@@ -68,10 +29,14 @@ async function initDB() {
       (2, 'DC002K18-DOOR',   'Дверь одинарная'),
       (2, 'DC002K18-SHOWER', 'Лейка тропик'),
       (2, 'DC002K18-SEAL',   'Уплотнитель'),
-      (2, 'DC002K18-HANDLE', 'Ручка скоба')
+      (2, 'DC002K18-HANDLE', 'Ручка скоба'),
+      (3, 'MX500W-BODY',     'Корпус смесителя'),
+      (3, 'MX500W-HANDLE',   'Ручка смесителя'),
+      (3, 'MX500W-SPOUT',    'Излив'),
+      (3, 'MX500W-SEAL',     'Уплотнитель'),
+      (3, 'MX500W-NUT',      'Гайка крепления')
     ON CONFLICT (part_code) DO NOTHING;
   `);
   console.log('Database initialized OK');
 }
-
 module.exports = { pool, initDB };
