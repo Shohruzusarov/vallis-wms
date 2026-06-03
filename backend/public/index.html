@@ -143,6 +143,8 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,sans-serif;m
     <div class="card" style="margin-bottom:12px">
       <div class="clabel">Сканировать деталь</div>
       <input id="s5-inp" class="scan-inp" placeholder="QR пистолетом или камерой..." autocomplete="off" autocorrect="off" spellcheck="false">
+<button onclick="toggleCam('s5')" id="cam-btn-s5" style="width:100%;margin-top:8px;padding:11px;background:#1e3a5f;color:#60a5fa;border:1px solid #2563eb;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">&#128247; Камера</button>
+<div id="cam-div-s5" style="margin-top:8px;border-radius:10px;overflow:hidden;display:none"></div>
     </div>
     <div class="card">
       <div class="clabel">Детали <span id="s5-prog" style="color:var(--tx);font-weight:600"></span></div>
@@ -158,6 +160,8 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,sans-serif;m
     <div class="card" style="margin-bottom:12px">
       <div class="clabel">Отсканируйте деталь</div>
       <input id="s6-inp" class="scan-inp" placeholder="QR пистолетом или камерой..." autocomplete="off" autocorrect="off" spellcheck="false">
+<button onclick="toggleCam('s6')" id="cam-btn-s6" style="width:100%;margin-top:8px;padding:11px;background:#1e3a5f;color:#60a5fa;border:1px solid #2563eb;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">&#128247; Камера</button>
+<div id="cam-div-s6" style="margin-top:8px;border-radius:10px;overflow:hidden;display:none"></div>
     </div>
     <div class="card">
       <div class="clabel">Прогресс <span id="s6-prog" style="color:var(--tx);font-weight:600"></span></div>
@@ -440,6 +444,64 @@ function cancelQty(){
   document.getElementById('qty-overlay').classList.remove('show');
   var activeInp=document.getElementById('s6-inp');
   setTimeout(function(){if(activeInp)activeInp.focus();}, 100);
+}
+
+
+var camInstances = {};
+
+function toggleCam(screen) {
+  var divId = 'cam-div-' + screen;
+  var btnId = 'cam-btn-' + screen;
+  var inpId = screen + '-inp';
+  var div = document.getElementById(divId);
+  var btn = document.getElementById(btnId);
+
+  if (camInstances[screen]) {
+    camInstances[screen].stop().catch(function(){});
+    camInstances[screen] = null;
+    div.style.display = 'none';
+    btn.textContent = '\u{1F4F7} Камера';
+    return;
+  }
+
+  div.style.display = 'block';
+  div.innerHTML = '';
+  btn.textContent = '\u23F9 Стоп';
+
+  var loadLib = typeof Html5Qrcode !== 'undefined'
+    ? Promise.resolve()
+    : new Promise(function(res, rej) {
+        var s = document.createElement('script');
+        s.src = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
+        s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+
+  loadLib.then(function() {
+    var qr = new Html5Qrcode(divId);
+    camInstances[screen] = qr;
+    qr.start(
+      {facingMode: 'environment'},
+      {fps: 10, qrbox: {width: 220, height: 220}},
+      function(code) {
+        qr.stop().catch(function(){});
+        camInstances[screen] = null;
+        div.style.display = 'none';
+        btn.textContent = '\u{1F4F7} Камера';
+        var inp = document.getElementById(inpId);
+        inp.value = code;
+        inp.dispatchEvent(new Event('change'));
+      },
+      function() {}
+    ).catch(function(err) {
+      div.innerHTML = '<div style="padding:12px;color:#ef4444;font-size:13px">Ошибка: ' + err + '</div>';
+      camInstances[screen] = null;
+      btn.textContent = '\u{1F4F7} Камера';
+    });
+  }).catch(function() {
+    div.innerHTML = '<div style="padding:12px;color:#ef4444;font-size:13px">Не удалось загрузить библиотеку</div>';
+    btn.textContent = '\u{1F4F7} Камера';
+  });
 }
 
 show('s1');
