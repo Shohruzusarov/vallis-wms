@@ -970,7 +970,7 @@
       document.getElementById('s6-prog').textContent = done + '/' + total;
       document.getElementById('s6-list').innerHTML = bParts.map(function (p) {
         var cnt = bCounts[p.part_code] || 0;
-        var cls = cnt >= bTotal ? 'ok' : cnt > bTotal ? 'over' : '';
+        var cls = cnt > bTotal ? 'over' : cnt >= bTotal ? 'ok' : '';
         return '<div class="batch-row">'
           + '<div class="batch-part"><div class="batch-name">' + p.part_name + '</div><div class="batch-code">' + p.part_code + '</div></div>'
           + '<div class="batch-cnt"><div class="batch-num ' + cls + '">' + cnt + '</div><div class="batch-need">/ ' + bTotal + '</div></div>'
