@@ -949,8 +949,8 @@
 
     function goS6() {
       api('/api/models/' + curOrd.model_id + '/parts').then(function (parts) {
-        bParts = parts; bTotal = curOrd.total_kits; bCounts = {};
-        parts.forEach(function (p) { bCounts[p.part_code] = 0; });
+        bParts = parts; bTotal = curOrd.total_kits;
+if (!bCounts || Object.keys(bCounts).length === 0 || bTotal !== curOrd.total_kits) { bCounts = {}; parts.forEach(function(p){ bCounts[p.part_code] = 0; }); }
         document.getElementById('s6-title').textContent = '[D] ' + curOrd.model_name;
         document.getElementById('s6-sub').textContent = curShip.client_name + ' · ' + curOrd.total_kits + ' kompл.';
         renderBatch();
