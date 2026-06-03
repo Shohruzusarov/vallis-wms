@@ -948,6 +948,7 @@
     }
 
     function goS6() {
+      if (curOrd.status === 'complete') { alert('Заказ уже завершён и готов к погрузке!'); return; }
       api('/api/models/' + curOrd.model_id + '/parts').then(function (parts) {
         bParts = parts; bTotal = curOrd.total_kits;
 if (!bCounts || Object.keys(bCounts).length === 0 || bTotal !== curOrd.total_kits) { bCounts = {}; parts.forEach(function(p){ bCounts[p.part_code] = 0; }); }
