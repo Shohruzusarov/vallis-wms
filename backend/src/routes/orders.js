@@ -25,4 +25,18 @@ router.get('/:orderId/kits/:kitNumber', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+router.post('/:orderId/complete', async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      "UPDATE orders SET status='complete' WHERE id=$1 RETURNING *",
+      [req.params.orderId]
+    );
+    await pool.query(
+      "UPDATE shipments SET status='complete' WHERE id=(SELECT shipment_id FROM orders WHERE id=$1) AND NOT EXISTS (SELECT 1 FROM orders WHERE shipment_id=(SELECT shipment_id FROM orders WHERE id=$1) AND status!='complete')",
+      [req.params.orderId]
+    );
+    res.json(rows[0]);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 module.exports = router;
