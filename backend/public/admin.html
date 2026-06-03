@@ -1,10 +1,440 @@
-<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Vallis WMS — Админ</title>
-<div class="sidebar"><div class="sl"><div class="sl-icon">V</div><div><div class="sl-tx">Vallis WMS</div><div class="sl-sub">Администратор</div></div></div><nav class="nav"><div class="ns">Главное</div><div class="ni active" onclick="showPage('dashboard',this)">Дашборд</div><div class="ni" onclick="showPage('orders',this)">Заказы</div><div class="ni" onclick="showPage('models',this)">Модели и детали</div><div class="ns">Аналитика</div><div class="ni" onclick="showPage('reports',this)">Отчёты</div><div class="ni" onclick="showPage('qr',this)">QR-этикетки</div></nav><div style="padding:12px 8px;border-top:1px solid #2d3148;font-size:11px;color:#4b5563;padding:12px 16px">vallis-wms-production.up.railway.app</div></div>
-<div class="main"><div class="topbar"><div class="tb-title" id="page-title">Дашборд</div><div style="display:flex;align-items:center;gap:12px"><span id="srv-status" class="badge by">Проверка...</span><a href="/" target="_blank" class="btn btn-s btn-sm">Склад ↗</a></div></div><div class="content">
-<div id="page-dashboard" class="page active"><div class="sg"><div class="sc"><div class="sc-label">Активных заказов</div><div class="sc-num" id="d-ord">—</div><div class="sc-sub">всего в системе</div></div><div class="sc"><div class="sc-label">Моделей</div><div class="sc-num" id="d-mod">—</div><div class="sc-sub">в каталоге</div></div><div class="sc"><div class="sc-label">Комплектов готово</div><div class="sc-num" id="d-done" style="color:var(--gn)">—</div><div class="sc-sub" id="d-done-sub">из всех</div></div><div class="sc"><div class="sc-label">Ошибок поймано</div><div class="sc-num" id="d-err" style="color:var(--rd)">—</div><div class="sc-sub">чужих деталей</div></div></div><div class="tc"><div class="th"><div class="th-title">Последние заказы</div></div><table><thead><tr><th>Заказ</th><th>Модель</th><th>Комплектов</th><th>Статус</th><th>Дата</th></tr></thead><tbody id="d-table"><tr><td colspan="5" style="text-align:center;color:var(--mt);padding:24px">Загрузка...</td></tr></tbody></table></div></div>
-<div id="page-orders" class="page"><div class="sec-card"><div class="sec-title">Новый заказ</div><div class="fg2"><div class="form-group"><label class="form-label">Номер заказа</label><input class="form-input" id="o-num" placeholder="ORD-002"></div><div class="form-group"><label class="form-label">Модель</label><select class="form-select" id="o-model"><option value="">Выберите...</option></select></div><div class="form-group"><label class="form-label">Количество комплектов</label><input class="form-input" id="o-kits" type="number" min="1" max="200" placeholder="60"></div><div class="form-group" style="display:flex;align-items:flex-end"><button class="btn btn-p" onclick="createOrder()" style="width:100%">Создать заказ</button></div></div><div id="o-alert"></div></div><div class="tc"><div class="th"><div class="th-title">Все заказы</div><button class="btn btn-s btn-sm" onclick="loadOrders()">Обновить</button></div><table><thead><tr><th>Заказ</th><th>Модель</th><th>Комплектов</th><th>Прогресс</th><th>Статус</th><th>Дата</th><th></th></tr></thead><tbody id="o-table"></tbody></table></div></div>
-<div id="page-models" class="page"><div class="fg2" style="margin-bottom:0"><div class="sec-card"><div class="sec-title">Добавить модель</div><div class="form-group"><label class="form-label">Код модели</label><input class="form-input" id="m-code" placeholder="DC003M22"></div><div class="form-group"><label class="form-label">Название</label><input class="form-input" id="m-name" placeholder="Душевая кабина DC-003M22"></div><button class="btn btn-p" onclick="createModel()" style="width:100%">Добавить модель</button><div id="m-alert" style="margin-top:12px"></div></div><div class="sec-card"><div class="sec-title">Добавить деталь</div><div class="form-group"><label class="form-label">Модель</label><select class="form-select" id="p-model"><option value="">Выберите...</option></select></div><div class="form-group"><label class="form-label">Код детали</label><input class="form-input" id="p-code" placeholder="DC003M22-LID-W"></div><div class="form-group"><label class="form-label">Название детали</label><input class="form-input" id="p-name" placeholder="Крышка белая"></div><button class="btn btn-p" onclick="createPart()" style="width:100%">Добавить деталь</button><div id="p-alert" style="margin-top:12px"></div></div></div><div class="tc" style="margin-top:20px"><div class="th"><div class="th-title">Каталог моделей</div><button class="btn btn-s btn-sm" onclick="loadModels()">Обновить</button></div><div id="m-list" style="padding:16px">Загрузка...</div></div></div>
-<div id="page-reports" class="page"><div class="sec-card"><div class="sec-title">Отчёт по заказу</div><div style="display:flex;gap:12px;align-items:flex-end"><div style="flex:1"><select class="form-select" id="r-order"><option value="">Выберите заказ...</option></select></div><button class="btn btn-p" onclick="loadReport()">Показать</button></div></div><div id="r-content"></div></div>
-<div id="page-qr" class="page"><div class="sec-card"><div class="sec-title">Печать QR-этикеток</div><p style="font-size:13px;color:var(--mt);margin-bottom:16px">Нажмите кнопку — откроется страница для печати. В браузере нажмите Cmd+P.</p><div id="qr-list">Загрузка...</div></div></div>
-</div></div>
-<div class="modal-ov" id="modal-order"><div class="modal"><div class="modal-title"><span id="modal-title">Заказ</span><button class="modal-close" onclick="document.getElementById('modal-order').classList.remove('show')">x</button></div><div id="modal-body"></div></div></div>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vallis WMS — Админ</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f8f9fa;--surface:#ffffff;--border:#e5e7eb;--text:#111827;--muted:#6b7280;--blue:#3b82f6;--blue-bg:#eff6ff;--green:#16a34a;--green-bg:#f0fdf4;--red:#dc2626;--red-bg:#fef2f2;--yellow:#d97706;--yellow-bg:#fffbeb;--sidebar:#1e2130;--sidebar-text:#a8b0c0;--sidebar-active:#ffffff}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;min-height:100vh}
+/* SIDEBAR */
+.sidebar{width:220px;background:var(--sidebar);flex-shrink:0;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+.sidebar-logo{padding:20px 16px;border-bottom:1px solid #2d3148;display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0}
+.logo-text{font-size:15px;font-weight:600;color:#fff}
+.logo-sub{font-size:11px;color:var(--sidebar-text);margin-top:1px}
+.nav{padding:12px 8px;flex:1}
+.nav-section{font-size:10px;color:#4b5563;text-transform:uppercase;letter-spacing:.8px;padding:8px 8px 4px;margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:var(--sidebar-text);font-size:13px;margin-bottom:2px;transition:all .15s}
+.nav-item:hover{background:#2d3148;color:#fff}
+.nav-item.active{background:#2d3148;color:#fff}
+.nav-item svg{width:16px;height:16px;flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.sidebar-bottom{padding:12px 8px;border-top:1px solid #2d3148}
+.sidebar-url{font-size:11px;color:#4b5563;padding:8px 10px;word-break:break-all}
+/* MAIN */
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-title{font-size:16px;font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.badge{display:inline-flex;align-items:center;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500}
+.badge-green{background:var(--green-bg);color:var(--green)}
+.badge-yellow{background:var(--yellow-bg);color:var(--yellow)}
+.badge-red{background:var(--red-bg);color:var(--red)}
+.badge-blue{background:var(--blue-bg);color:var(--blue)}
+.content{flex:1;padding:24px}
+/* CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px}
+.stat-label{font-size:12px;color:var(--muted);margin-bottom:6px}
+.stat-num{font-size:28px;font-weight:700;color:var(--text)}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
+/* TABLE */
+.table-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px}
+.table-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.table-title{font-size:14px;font-weight:600}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:12px;color:var(--muted);font-weight:500;padding:10px 20px;border-bottom:1px solid var(--border);background:#fafafa;text-transform:uppercase;letter-spacing:.4px}
+td{padding:12px 20px;font-size:13px;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+/* FORMS */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{margin-bottom:16px}
+.form-label{font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px;display:block}
+.form-input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);background:var(--surface);transition:border-color .15s}
+.form-input:focus{outline:none;border-color:var(--blue)}
+.form-select{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);background:var(--surface)}
+.form-select:focus{outline:none;border-color:var(--blue)}
+/* BUTTONS */
+.btn{padding:8px 16px;border-radius:8px;border:none;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:#2563eb}
+.btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--bg)}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid #fecaca}
+.btn-sm{padding:5px 10px;font-size:12px}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border-radius:16px;padding:24px;width:480px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px;line-height:1}
+/* TABS inside page */
+.page{display:none}.page.active{display:block}
+.section-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px}
+.section-title{font-size:14px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.progress-bar{height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:var(--green);border-radius:3px;transition:width .3s}
+.empty-state{text-align:center;padding:40px;color:var(--muted)}
+.empty-icon{font-size:32px;margin-bottom:8px}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--border);color:var(--muted);margin-right:4px}
+.alert{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:16px}
+.alert-success{background:var(--green-bg);color:var(--green);border:1px solid #bbf7d0}
+.alert-error{background:var(--red-bg);color:var(--red);border:1px solid #fecaca}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">V</div>
+    <div><div class="logo-text">Vallis WMS</div><div class="logo-sub">Администратор</div></div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Главное</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="2"/></svg>
+      Дашборд
+    </div>
+    <div class="nav-item" onclick="showPage('orders',this)">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      Заказы
+    </div>
+    <div class="nav-item" onclick="showPage('models',this)">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+      Модели и детали
+    </div>
+    <div class="nav-section">Аналитика</div>
+    <div class="nav-item" onclick="showPage('reports',this)">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      Отчёты
+    </div>
+    <div class="nav-item" onclick="showPage('qr',this)">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+      QR-этикетки
+    </div>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="sidebar-url">vallis-wms-production.up.railway.app</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Дашборд</div>
+    <div class="topbar-right">
+      <span id="server-status" class="badge badge-yellow">Проверка...</span>
+      <a href="/" target="_blank" class="btn btn-secondary btn-sm">Открыть склад ↗</a>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Активных заказов</div><div class="stat-num" id="d-orders">—</div><div class="stat-sub">всего в системе</div></div>
+        <div class="stat-card"><div class="stat-label">Моделей</div><div class="stat-num" id="d-models">—</div><div class="stat-sub">в каталоге</div></div>
+        <div class="stat-card"><div class="stat-label">Комплектов готово</div><div class="stat-num" id="d-kits-done" style="color:var(--green)">—</div><div class="stat-sub" id="d-kits-sub">из всех</div></div>
+        <div class="stat-card"><div class="stat-label">Ошибок поймано</div><div class="stat-num" id="d-errors" style="color:var(--red)">—</div><div class="stat-sub">чужих деталей</div></div>
+      </div>
+      <div class="table-card">
+        <div class="table-header"><div class="table-title">Последние заказы</div><button class="btn btn-primary btn-sm" onclick="showPage('orders',document.querySelector('[onclick*=orders]'))">Все заказы</button></div>
+        <table><thead><tr><th>Заказ</th><th>Модель</th><th>Комплектов</th><th>Статус</th><th>Дата</th></tr></thead>
+        <tbody id="d-orders-table"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">Загрузка...</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div id="page-orders" class="page">
+      <div class="section-card">
+        <div class="section-title">Новый заказ</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Номер заказа</label><input class="form-input" id="o-num" placeholder="ORD-002"></div>
+          <div class="form-group"><label class="form-label">Модель</label><select class="form-select" id="o-model"><option value="">Выберите модель...</option></select></div>
+          <div class="form-group"><label class="form-label">Количество комплектов</label><input class="form-input" id="o-kits" type="number" min="1" max="200" placeholder="60"></div>
+          <div class="form-group" style="display:flex;align-items:flex-end"><button class="btn btn-primary" onclick="createOrder()" style="width:100%">Создать заказ</button></div>
+        </div>
+        <div id="o-alert"></div>
+      </div>
+      <div class="table-card">
+        <div class="table-header"><div class="table-title">Все заказы</div><button class="btn btn-secondary btn-sm" onclick="loadOrders()">Обновить</button></div>
+        <table><thead><tr><th>Заказ</th><th>Модель</th><th>Комплектов</th><th>Прогресс</th><th>Статус</th><th>Дата</th><th></th></tr></thead>
+        <tbody id="o-table"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">Загрузка...</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- MODELS -->
+    <div id="page-models" class="page">
+      <div class="form-grid" style="margin-bottom:20px">
+        <div class="section-card">
+          <div class="section-title">Добавить модель</div>
+          <div class="form-group"><label class="form-label">Код модели</label><input class="form-input" id="m-code" placeholder="DC003M22"></div>
+          <div class="form-group"><label class="form-label">Название</label><input class="form-input" id="m-name" placeholder="Душевая кабина DC-003M22"></div>
+          <button class="btn btn-primary" onclick="createModel()" style="width:100%">Добавить модель</button>
+          <div id="m-alert" style="margin-top:12px"></div>
+        </div>
+        <div class="section-card">
+          <div class="section-title">Добавить деталь к модели</div>
+          <div class="form-group"><label class="form-label">Модель</label><select class="form-select" id="p-model"><option value="">Выберите модель...</option></select></div>
+          <div class="form-group"><label class="form-label">Код детали</label><input class="form-input" id="p-code" placeholder="DC003M22-LID-W"></div>
+          <div class="form-group"><label class="form-label">Название детали</label><input class="form-input" id="p-name" placeholder="Крышка белая"></div>
+          <button class="btn btn-primary" onclick="createPart()" style="width:100%">Добавить деталь</button>
+          <div id="p-alert" style="margin-top:12px"></div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header"><div class="table-title">Модели и их детали</div><button class="btn btn-secondary btn-sm" onclick="loadModels()">Обновить</button></div>
+        <div id="m-list" style="padding:16px">Загрузка...</div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="page-reports" class="page">
+      <div class="section-card">
+        <div class="section-title">Выберите заказ для отчёта</div>
+        <div style="display:flex;gap:12px;align-items:flex-end">
+          <div style="flex:1"><select class="form-select" id="r-order"><option value="">Выберите заказ...</option></select></div>
+          <button class="btn btn-primary" onclick="loadReport()">Показать отчёт</button>
+        </div>
+      </div>
+      <div id="r-content"></div>
+    </div>
+
+    <!-- QR -->
+    <div id="page-qr" class="page">
+      <div class="section-card">
+        <div class="section-title">Печать QR-этикеток</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Выберите модель и нажмите "Открыть для печати" — откроется страница которую можно распечатать на принтере этикеток.</p>
+        <div id="qr-list">Загрузка...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL: Order detail -->
+<div class="modal-overlay" id="modal-order">
+  <div class="modal">
+    <div class="modal-title"><span id="modal-order-title">Заказ</span><button class="modal-close" onclick="closeModal('modal-order')">×</button></div>
+    <div id="modal-order-body"></div>
+  </div>
+</div>
+
+<script>
+const API = '';
+
+async function api(path, method, body) {
+  method = method || 'GET';
+  const o = {method, headers: {'Content-Type': 'application/json'}};
+  if (body) o.body = JSON.stringify(body);
+  const r = await fetch(API + path, o);
+  return r.json();
+}
+
+function showPage(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  const titles = {dashboard:'Дашборд',orders:'Заказы',models:'Модели и детали',reports:'Отчёты',qr:'QR-этикетки'};
+  document.getElementById('page-title').textContent = titles[name] || name;
+  if (name === 'dashboard') loadDashboard();
+  if (name === 'orders') loadOrders();
+  if (name === 'models') loadModels();
+  if (name === 'reports') loadReportSelect();
+  if (name === 'qr') loadQR();
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+function alert_(elId, msg, type) {
+  const el = document.getElementById(elId);
+  el.innerHTML = '<div class="alert alert-' + (type||'success') + '">' + msg + '</div>';
+  setTimeout(() => el.innerHTML = '', 3000);
+}
+
+async function loadDashboard() {
+  const [orders, models] = await Promise.all([api('/api/orders'), api('/api/models')]);
+  document.getElementById('d-orders').textContent = orders.length;
+  document.getElementById('d-models').textContent = models.length;
+
+  let totalKits = 0, doneKits = 0, totalErrors = 0;
+  const reportsData = await Promise.all(orders.map(o => api('/api/reports/order/' + o.id)));
+  reportsData.forEach(r => {
+    if (r && r.total_kits) {
+      totalKits += r.total_kits;
+      doneKits += r.complete_kits || 0;
+      totalErrors += r.errors_count || 0;
+    }
+  });
+  document.getElementById('d-kits-done').textContent = doneKits;
+  document.getElementById('d-kits-sub').textContent = 'из ' + totalKits + ' комплектов';
+  document.getElementById('d-errors').textContent = totalErrors;
+
+  const tbody = document.getElementById('d-orders-table');
+  if (!orders.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Нет заказов</td></tr>'; return; }
+  tbody.innerHTML = orders.slice(0,10).map(o => {
+    const d = new Date(o.created_at);
+    const dateStr = d.toLocaleDateString('ru-RU');
+    return '<tr><td><strong>' + o.order_number + '</strong></td><td>' + o.model_name + '</td><td>' + o.total_kits + '</td><td><span class="badge ' + (o.status==='complete'?'badge-green':'badge-yellow') + '">' + (o.status==='complete'?'Готов':'В работе') + '</span></td><td style="color:var(--muted)">' + dateStr + '</td></tr>';
+  }).join('');
+}
+
+async function loadOrders() {
+  const [orders, models] = await Promise.all([api('/api/orders'), api('/api/models')]);
+  const sel = document.getElementById('o-model');
+  sel.innerHTML = '<option value="">Выберите модель...</option>' + models.map(m => '<option value="' + m.id + '">' + m.name + '</option>').join('');
+
+  const tbody = document.getElementById('o-table');
+  if (!orders.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><div class="empty-icon">📦</div>Нет заказов</td></tr>'; return; }
+
+  const reportsData = await Promise.all(orders.map(o => api('/api/reports/order/' + o.id)));
+  tbody.innerHTML = orders.map((o, i) => {
+    const r = reportsData[i] || {};
+    const done = r.complete_kits || 0;
+    const total = o.total_kits;
+    const pct = total > 0 ? Math.round(done/total*100) : 0;
+    const d = new Date(o.created_at).toLocaleDateString('ru-RU');
+    return '<tr>' +
+      '<td><strong>' + o.order_number + '</strong></td>' +
+      '<td>' + o.model_name + '</td>' +
+      '<td>' + total + '</td>' +
+      '<td style="min-width:140px"><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="flex:1"><div class="progress-fill" style="width:' + pct + '%"></div></div><span style="font-size:12px;color:var(--muted);min-width:36px">' + done + '/' + total + '</span></div></td>' +
+      '<td><span class="badge ' + (o.status==='complete'?'badge-green':'badge-yellow') + '">' + (o.status==='complete'?'Готов':'В работе') + '</span></td>' +
+      '<td style="color:var(--muted)">' + d + '</td>' +
+      '<td><button class="btn btn-secondary btn-sm" onclick="openOrderDetail(' + o.id + ')">Детали</button></td>' +
+      '</tr>';
+  }).join('');
+}
+
+async function createOrder() {
+  const num = document.getElementById('o-num').value.trim();
+  const model = document.getElementById('o-model').value;
+  const kits = document.getElementById('o-kits').value;
+  if (!num || !model || !kits) { alert_('o-alert','Заполните все поля','error'); return; }
+  await api('/api/orders', 'POST', {order_number: num, model_id: parseInt(model), total_kits: parseInt(kits)});
+  document.getElementById('o-num').value = '';
+  document.getElementById('o-kits').value = '';
+  alert_('o-alert', 'Заказ ' + num + ' создан!');
+  loadOrders();
+}
+
+async function openOrderDetail(orderId) {
+  const data = await api('/api/reports/order/' + orderId);
+  document.getElementById('modal-order-title').textContent = 'Заказ ' + (data.order ? data.order.order_number : orderId);
+  const body = document.getElementById('modal-order-body');
+  if (!data.order) { body.innerHTML = 'Данные не найдены'; return; }
+  const pct = data.total_kits > 0 ? Math.round(data.complete_kits/data.total_kits*100) : 0;
+  body.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">' +
+    '<div class="stat-card" style="padding:12px"><div class="stat-label">Комплектов</div><div class="stat-num" style="font-size:20px">' + data.total_kits + '</div></div>' +
+    '<div class="stat-card" style="padding:12px"><div class="stat-label">Готово</div><div class="stat-num" style="font-size:20px;color:var(--green)">' + data.complete_kits + '</div></div>' +
+    '<div class="stat-card" style="padding:12px"><div class="stat-label">Ошибок</div><div class="stat-num" style="font-size:20px;color:var(--red)">' + data.errors_count + '</div></div>' +
+    '</div>' +
+    '<div style="margin-bottom:16px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">Прогресс ' + pct + '%</div><div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div></div>' +
+    (data.errors && data.errors.length ? '<div style="font-size:13px;font-weight:500;margin-bottom:8px">Найденные ошибки:</div>' +
+    data.errors.slice(0,5).map(e => '<div style="padding:8px 12px;background:var(--red-bg);border-radius:8px;margin-bottom:6px;font-size:12px;color:var(--red)">' + e.message + '</div>').join('') : '<div style="font-size:13px;color:var(--green)">Ошибок не обнаружено ✓</div>');
+  document.getElementById('modal-order').classList.add('show');
+}
+
+async function loadModels() {
+  const models = await api('/api/models');
+  const sel = document.getElementById('p-model');
+  sel.innerHTML = '<option value="">Выберите модель...</option>' + models.map(m => '<option value="' + m.id + '">' + m.name + '</option>').join('');
+
+  const list = document.getElementById('m-list');
+  if (!models.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div>Нет моделей</div>'; return; }
+
+  const partsData = await Promise.all(models.map(m => api('/api/models/' + m.id + '/parts')));
+  list.innerHTML = models.map((m, i) => {
+    const parts = partsData[i] || [];
+    return '<div style="margin-bottom:20px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div><strong style="font-size:14px">' + m.name + '</strong><span class="tag" style="margin-left:8px">' + m.code + '</span></div><span class="badge badge-blue">' + parts.length + ' деталей</span></div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px">' + parts.map(p => '<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px"><div style="font-weight:500">' + p.part_name + '</div><div style="color:var(--muted);font-family:monospace;font-size:10px;margin-top:2px">' + p.part_code + '</div></div>').join('') + '</div></div>';
+  }).join('<hr style="border:none;border-top:1px solid var(--border);margin-bottom:20px">');
+}
+
+async function createModel() {
+  const code = document.getElementById('m-code').value.trim();
+  const name = document.getElementById('m-name').value.trim();
+  if (!code || !name) { alert_('m-alert','Заполните все поля','error'); return; }
+  try {
+    await fetch('/api/models', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,name})});
+    document.getElementById('m-code').value = '';
+    document.getElementById('m-name').value = '';
+    alert_('m-alert', 'Модель ' + code + ' добавлена!');
+    loadModels();
+  } catch(e) { alert_('m-alert','Ошибка: ' + e.message,'error'); }
+}
+
+async function createPart() {
+  const model_id = document.getElementById('p-model').value;
+  const part_code = document.getElementById('p-code').value.trim();
+  const part_name = document.getElementById('p-name').value.trim();
+  if (!model_id || !part_code || !part_name) { alert_('p-alert','Заполните все поля','error'); return; }
+  try {
+    await fetch('/api/parts', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model_id:parseInt(model_id),part_code,part_name})});
+    document.getElementById('p-code').value = '';
+    document.getElementById('p-name').value = '';
+    alert_('p-alert', 'Деталь ' + part_name + ' добавлена!');
+    loadModels();
+  } catch(e) { alert_('p-alert','Ошибка: ' + e.message,'error'); }
+}
+
+async function loadReportSelect() {
+  const orders = await api('/api/orders');
+  const sel = document.getElementById('r-order');
+  sel.innerHTML = '<option value="">Выберите заказ...</option>' + orders.map(o => '<option value="' + o.id + '">' + o.order_number + ' — ' + o.model_name + '</option>').join('');
+}
+
+async function loadReport() {
+  const id = document.getElementById('r-order').value;
+  if (!id) return;
+  const data = await api('/api/reports/order/' + id);
+  if (!data.order) { document.getElementById('r-content').innerHTML = '<div class="alert alert-error">Данные не найдены</div>'; return; }
+  const pct = data.total_kits > 0 ? Math.round(data.complete_kits/data.total_kits*100) : 0;
+  document.getElementById('r-content').innerHTML =
+    '<div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">' +
+    '<div class="stat-card"><div class="stat-label">Всего комплектов</div><div class="stat-num">' + data.total_kits + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">Готово</div><div class="stat-num" style="color:var(--green)">' + data.complete_kits + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">Ошибок поймано</div><div class="stat-num" style="color:var(--red)">' + data.errors_count + '</div></div>' +
+    '</div>' +
+    '<div class="section-card"><div class="section-title">Прогресс выполнения — ' + pct + '%</div><div class="progress-bar" style="height:10px"><div class="progress-fill" style="width:' + pct + '%"></div></div></div>' +
+    (data.errors && data.errors.length ?
+    '<div class="table-card"><div class="table-header"><div class="table-title">Журнал ошибок (' + data.errors_count + ')</div></div><table><thead><tr><th>Время</th><th>Код детали</th><th>Сообщение</th></tr></thead><tbody>' +
+    data.errors.map(e => '<tr><td style="color:var(--muted)">' + new Date(e.scanned_at).toLocaleString('ru-RU') + '</td><td style="font-family:monospace">' + e.part_code + '</td><td style="color:var(--red)">' + e.message + '</td></tr>').join('') +
+    '</tbody></table></div>' : '<div class="section-card" style="color:var(--green);text-align:center;padding:24px">Ошибок не обнаружено ✓</div>');
+}
+
+async function loadQR() {
+  const models = await api('/api/models');
+  document.getElementById('qr-list').innerHTML = models.map(m =>
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)">' +
+    '<div><div style="font-size:14px;font-weight:500">' + m.name + '</div><div style="font-size:12px;color:var(--muted);margin-top:2px">' + m.code + '</div></div>' +
+    '<div style="display:flex;gap:8px">' +
+    '<a href="/api/qr/model/' + m.id + '/sheet" target="_blank" class="btn btn-primary btn-sm">Открыть для печати ↗</a>' +
+    '</div></div>'
+  ).join('') + '<div style="padding-top:14px;font-size:12px;color:var(--muted)">Нажмите "Открыть для печати" → в браузере нажмите Ctrl+P (или Cmd+P на Mac)</div>';
+}
+
+async function checkServer() {
+  try {
+    const r = await api('/health');
+    if (r.status === 'ok') {
+      document.getElementById('server-status').className = 'badge badge-green';
+      document.getElementById('server-status').textContent = 'Сервер онлайн';
+    }
+  } catch(e) {
+    document.getElementById('server-status').className = 'badge badge-red';
+    document.getElementById('server-status').textContent = 'Сервер недоступен';
+  }
+}
+
+checkServer();
+loadDashboard();
+setInterval(checkServer, 30000);
+</script>
+</body>
+</html>
