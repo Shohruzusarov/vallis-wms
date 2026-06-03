@@ -1,14 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>Vallis WMS</title>
+<html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>Vallis WMS</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0f1117;--sf:#1a1d27;--br:#2a2d3a;--tx:#e8eaf0;--mt:#6b7280;--gn:#22c55e;--rd:#ef4444;--yw:#f59e0b;--bl:#3b82f6;--gbg:#052e16;--rbg:#2d0a0a;--ybg:#2d1a00}
-body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,sans-serif;min-height:100vh}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,sans-serif;min-height:100vh}
 .screen{display:none;min-height:100vh;flex-direction:column}.screen.active{display:flex}
 .header{background:var(--sf);border-bottom:1px solid var(--br);padding:14px 16px;display:flex;align-items:center;gap:12px}
 .hl{width:32px;height:32px;background:var(--bl);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0}
@@ -17,8 +12,12 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSyst
 .content{flex:1;padding:16px}
 .card{background:var(--sf);border:1px solid var(--br);border-radius:12px;padding:16px;margin-bottom:12px}
 .ct{font-size:13px;color:var(--mt);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px}
-.oi{background:var(--sf);border:1px solid var(--br);border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer}
-.oi:active{border-color:var(--bl)}.on{font-size:15px;font-weight:600}.om{font-size:13px;color:var(--mt);margin-top:4px}
+.si-item{background:var(--sf);border:1px solid var(--br);border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer}
+.si-item:active{border-color:var(--bl)}
+.si-num{font-size:15px;font-weight:600}.si-client{font-size:13px;color:var(--bl);margin-top:2px}
+.si-meta{font-size:12px;color:var(--mt);margin-top:4px}
+.oi{background:var(--sf);border:1px solid var(--br);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer}
+.oi:active{border-color:var(--bl)}.on{font-size:14px;font-weight:600}.om{font-size:12px;color:var(--mt);margin-top:2px}
 .kg{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px}
 .kb{background:var(--sf);border:1px solid var(--br);border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer}
 .kb:active{transform:scale(.95)}.kb.complete{border-color:var(--gn);background:var(--gbg)}
@@ -39,262 +38,224 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSyst
 .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
 .stat{background:var(--sf);border:1px solid var(--br);border-radius:10px;padding:12px;text-align:center}
 .sn{font-size:22px;font-weight:700}.sl{font-size:11px;color:var(--mt);margin-top:2px}
-.empty{text-align:center;padding:40px 20px;color:var(--mt)}.loading{text-align:center;padding:40px;color:var(--mt)}
 .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600}
 .bg{background:var(--gbg);color:var(--gn)}.by{background:var(--ybg);color:var(--yw)}
-.pb{height:4px;background:var(--br);border-radius:2px;overflow:hidden}
-.pf{height:100%;background:var(--gn);border-radius:2px;transition:width .3s}
+.pb{height:4px;background:var(--br);border-radius:2px;overflow:hidden}.pf{height:100%;background:var(--gn);border-radius:2px;transition:width .3s}
+.empty{text-align:center;padding:40px 20px;color:var(--mt)}.loading{text-align:center;padding:40px;color:var(--mt)}
 input,select{width:100%;background:var(--bg);border:1px solid var(--br);border-radius:8px;padding:10px 12px;color:var(--tx);font-size:14px;margin-bottom:8px}
 input:focus,select:focus{outline:none;border-color:var(--bl)}
-.mode-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
-.mode-btn{padding:14px 10px;border-radius:12px;border:1px solid var(--br);background:var(--sf);color:var(--tx);cursor:pointer;text-align:center}
-.mode-btn:active{transform:scale(.97)}.mode-btn .mb-icon{font-size:24px;margin-bottom:6px}
-.mode-btn .mb-title{font-size:14px;font-weight:600}.mode-btn .mb-sub{font-size:11px;color:var(--mt);margin-top:3px}
-.mode-btn.mode-kit{border-color:var(--bl);background:#0c1a2e}
-.mode-btn.mode-batch{border-color:#7c3aed;background:#1a0a2e}
+.mode-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mb{padding:14px 10px;border-radius:12px;border:1px solid var(--br);background:var(--sf);color:var(--tx);cursor:pointer;text-align:center}
+.mb-i{font-size:24px;margin-bottom:6px}.mb-t{font-size:14px;font-weight:600}.mb-s{font-size:11px;color:var(--mt);margin-top:3px}
+.mb-kit{border-color:var(--bl);background:#0c1a2e}.mb-batch{border-color:#7c3aed;background:#1a0a2e}
 .batch-row{display:flex;align-items:center;padding:12px 0;border-bottom:1px solid var(--br);gap:10px}
-.batch-row:last-child{border-bottom:none}
-.batch-part{flex:1}.batch-name{font-size:14px;font-weight:500}.batch-code{font-size:11px;color:var(--mt);font-family:monospace}
-.batch-counter{display:flex;align-items:center;gap:8px}
-.batch-num{font-size:18px;font-weight:700;min-width:32px;text-align:center}
-.batch-num.done{color:var(--gn)}.batch-num.over{color:var(--rd)}
-.batch-needed{font-size:11px;color:var(--mt)}
-</style>
-</head>
-<body>
+.batch-row:last-child{border-bottom:none}.bp{flex:1}.bn{font-size:14px;font-weight:500}.bc{font-size:11px;color:var(--mt);font-family:monospace}
+.bcount{display:flex;align-items:center;gap:6px}.bnum{font-size:18px;font-weight:700;min-width:28px;text-align:center}
+.bnum.done{color:var(--gn)}.bnum.over{color:var(--rd)}.bneed{font-size:11px;color:var(--mt)}
+</style></head><body>
 
-<div id="so" class="screen active">
-  <div class="header"><div class="hl">V</div><div><div class="ht">Vallis WMS</div><div class="hs">Контроль комплектации</div></div></div>
+<div id="s-ship" class="screen active">
+  <div class="header"><div class="hl">V</div><div><div class="ht">Vallis WMS</div><div class="hs">Склад — поставки</div></div></div>
   <div class="content">
-    <div class="card">
-      <div class="ct">Новый заказ</div>
-      <select id="nom"><option value="">Выберите модель...</option></select>
-      <input id="nok" type="number" placeholder="Количество комплектов" min="1" max="200">
-      <button class="btn btn-p" onclick="createOrder()">Создать заказ</button>
-    </div>
-    <div class="ct" style="margin-bottom:8px">Активные заказы</div>
-    <div id="ol"><div class="loading">Загрузка...</div></div>
+    <div class="ct" style="margin-bottom:8px">Активные поставки</div>
+    <div id="ship-list"><div class="loading">Загрузка...</div></div>
   </div>
 </div>
 
-<div id="sm" class="screen">
-  <div class="header"><div class="hl">V</div><div><div class="ht" id="m-title">Заказ</div><div class="hs" id="m-sub"></div></div><button class="hb" onclick="showOrders()">← Назад</button></div>
+<div id="s-orders" class="screen">
+  <div class="header"><div class="hl">V</div><div><div class="ht" id="so-title">Поставка</div><div class="hs" id="so-sub"></div></div><button class="hb" onclick="showShipments()">&#8592; Назад</button></div>
+  <div class="content">
+    <div class="ct" style="margin-bottom:8px">Позиции поставки</div>
+    <div id="order-list"></div>
+  </div>
+</div>
+
+<div id="s-mode" class="screen">
+  <div class="header"><div class="hl">V</div><div><div class="ht" id="sm-title">Заказ</div><div class="hs" id="sm-sub"></div></div><button class="hb" onclick="showOrders()">&#8592; Назад</button></div>
   <div class="content">
     <div class="card">
-      <div class="ct" style="margin-bottom:12px">Выберите режим сборки</div>
+      <div class="ct" style="margin-bottom:12px">Режим сборки</div>
       <div class="mode-btns">
-        <div class="mode-btn mode-kit" onclick="showKits()">
-          <div class="mb-icon">📦</div>
-          <div class="mb-title">По комплектам</div>
-          <div class="mb-sub">Собирай один комплект целиком</div>
-        </div>
-        <div class="mode-btn mode-batch" onclick="showBatch()">
-          <div class="mb-icon">🔢</div>
-          <div class="mb-title">По деталям</div>
-          <div class="mb-sub">Иди к блоку — бери сразу все</div>
-        </div>
+        <div class="mb mb-kit" onclick="showKits()"><div class="mb-i">&#128230;</div><div class="mb-t">По комплектам</div><div class="mb-s">Один комплект целиком</div></div>
+        <div class="mb mb-batch" onclick="showBatch()"><div class="mb-i">&#128290;</div><div class="mb-t">По деталям</div><div class="mb-s">Все сразу по типу</div></div>
       </div>
     </div>
   </div>
 </div>
 
-<div id="sk" class="screen">
-  <div class="header"><div class="hl">V</div><div><div class="ht" id="kt">Заказ</div><div class="hs" id="ksb"></div></div><button class="hb" onclick="showMode()">← Назад</button></div>
+<div id="s-kits" class="screen">
+  <div class="header"><div class="hl">V</div><div><div class="ht" id="sk-title">Комплекты</div><div class="hs" id="sk-sub"></div></div><button class="hb" onclick="showMode()">&#8592; Назад</button></div>
   <div class="content">
     <div class="stats">
-      <div class="stat"><div class="sn" id="st">0</div><div class="sl">Всего</div></div>
-      <div class="stat"><div class="sn" style="color:var(--gn)" id="sd">0</div><div class="sl">Готово</div></div>
-      <div class="stat"><div class="sn" style="color:var(--yw)" id="sl2">0</div><div class="sl">Осталось</div></div>
+      <div class="stat"><div class="sn" id="k-total">0</div><div class="sl">Всего</div></div>
+      <div class="stat"><div class="sn" style="color:var(--gn)" id="k-done">0</div><div class="sl">Готово</div></div>
+      <div class="stat"><div class="sn" style="color:var(--yw)" id="k-left">0</div><div class="sl">Осталось</div></div>
     </div>
-    <div class="ct" style="margin-bottom:8px">Выберите комплект</div>
-    <div id="kg" class="kg"></div>
+    <div id="kits-grid" class="kg"></div>
   </div>
 </div>
 
-<div id="ss" class="screen">
-  <div class="header"><div class="hl">V</div><div><div class="ht" id="scti">Комплект</div><div class="hs" id="scs"></div></div><button class="hb" onclick="showKits()">← Назад</button></div>
+<div id="s-scan" class="screen">
+  <div class="header"><div class="hl">V</div><div><div class="ht" id="sc-title">Комплект</div><div class="hs" id="sc-sub"></div></div><button class="hb" onclick="showKits()">&#8592; Назад</button></div>
   <div class="content">
-    <div class="cb" id="cb"><div class="ci">✅</div><div class="ctl">Комплект полный!</div><div class="cs">Все детали проверены — можно грузить</div></div>
-    <div id="rb" class="rb"><div class="ri" id="rri"></div><div class="rt" id="rrt"></div><div class="rs" id="rrs"></div></div>
-    <div class="card" style="margin-bottom:12px"><div class="ct">Сканировать деталь</div><input id="sci" class="si" placeholder="Сканируйте QR пистолетом..." autocomplete="off" autocorrect="off" spellcheck="false"></div>
-    <div class="card"><div class="ct">Список деталей <span id="pt" style="color:var(--tx);font-weight:600"></span></div><div class="pb" style="margin-bottom:12px"><div class="pf" id="pf" style="width:0%"></div></div><div id="pcl"></div></div>
+    <div class="cb" id="scan-cb"><div class="ci">&#9989;</div><div class="ctl">Комплект полный!</div><div class="cs">Все детали — можно грузить</div></div>
+    <div id="scan-rb" class="rb"><div class="ri" id="sc-ri"></div><div class="rt" id="sc-rt"></div><div class="rs" id="sc-rs"></div></div>
+    <div class="card" style="margin-bottom:12px"><div class="ct">Сканировать</div><input id="scan-inp" class="si" placeholder="QR пистолетом..." autocomplete="off" autocorrect="off" spellcheck="false"></div>
+    <div class="card"><div class="ct">Детали <span id="sc-prog" style="color:var(--tx);font-weight:600"></span></div><div class="pb" style="margin-bottom:12px"><div class="pf" id="sc-pf" style="width:0%"></div></div><div id="sc-list"></div></div>
   </div>
 </div>
 
-<div id="sb" class="screen">
-  <div class="header"><div class="hl">V</div><div><div class="ht" id="bt">Сборка по деталям</div><div class="hs" id="bs"></div></div><button class="hb" onclick="showMode()">← Назад</button></div>
+<div id="s-batch" class="screen">
+  <div class="header"><div class="hl">V</div><div><div class="ht" id="bt-title">По деталям</div><div class="hs" id="bt-sub"></div></div><button class="hb" onclick="showMode()">&#8592; Назад</button></div>
   <div class="content">
-    <div id="brb" class="rb"><div class="ri" id="brri"></div><div class="rt" id="brrt"></div><div class="rs" id="brrs"></div></div>
-    <div class="card" style="margin-bottom:12px">
-      <div class="ct">Сканировать деталь</div>
-      <input id="bsi" class="si" placeholder="Сканируйте QR пистолетом..." autocomplete="off" autocorrect="off" spellcheck="false">
-    </div>
-    <div class="card">
-      <div class="ct">Прогресс по деталям <span id="bpt" style="color:var(--tx);font-weight:600"></span></div>
-      <div class="pb" style="margin-bottom:12px"><div class="pf" id="bpf" style="width:0%"></div></div>
-      <div id="bpl"></div>
-    </div>
-    <div class="cb" id="bcb"><div class="ci">🎉</div><div class="ctl">Все детали собраны!</div><div class="cs">Можно везти на упаковку</div></div>
+    <div id="batch-rb" class="rb"><div class="ri" id="bt-ri"></div><div class="rt" id="bt-rt"></div><div class="rs" id="bt-rs"></div></div>
+    <div class="card" style="margin-bottom:12px"><div class="ct">Сканировать</div><input id="batch-inp" class="si" placeholder="QR пистолетом..." autocomplete="off" autocorrect="off" spellcheck="false"></div>
+    <div class="card"><div class="ct">Прогресс <span id="bt-prog" style="color:var(--tx);font-weight:600"></span></div><div class="pb" style="margin-bottom:12px"><div class="pf" id="bt-pf" style="width:0%"></div></div><div id="bt-list"></div></div>
+    <div class="cb" id="batch-cb"><div class="ci">&#127881;</div><div class="ctl">Все детали собраны!</div><div class="cs">Везите на упаковку</div></div>
   </div>
 </div>
 
 <script>
 const API='';
-let co=null,ck=null,ap=[];
-let batchCounts={};
-let batchParts=[];
-let batchTotal=0;
+let curShip=null,curOrder=null,curKit=null,curParts=[];
+let bParts=[],bCounts={},bTotal=0;
 
 async function api(p,m,b){m=m||'GET';const o={method:m,headers:{'Content-Type':'application/json'}};if(b)o.body=JSON.stringify(b);return(await fetch(API+p,o)).json();}
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
-async function showOrders(){
-  show('so');
-  const[orders,models]=await Promise.all([api('/api/orders'),api('/api/models')]);
-  const sel=document.getElementById('nom');
-  sel.innerHTML='<option value="">Выберите модель...</option>'+models.map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('');
-  const list=document.getElementById('ol');
-  if(!orders.length){list.innerHTML='<div class="empty">Нет заказов. Создайте первый выше.</div>';return;}
-  list.innerHTML=orders.map(o=>'<div class="oi" onclick="selectOrder('+o.id+')"><div style="display:flex;align-items:center;justify-content:space-between"><div class="on">'+o.order_number+'</div><span class="badge '+(o.status==="complete"?"bg":"by")+'">'+(o.status==="complete"?"Готов":"В работе")+'</span></div><div class="om">'+o.model_name+' &middot; '+o.total_kits+' комплектов</div></div>').join('');
+async function showShipments(){
+  show('s-ship');
+  const ships=await api('/api/shipments');
+  const el=document.getElementById('ship-list');
+  if(!ships.length){el.innerHTML='<div class="empty">Нет активных поставок.<br>Создайте в админ-панели.</div>';return;}
+  el.innerHTML=ships.map(s=>'<div class="si-item" onclick="selectShipment('+s.id+')"><div style="display:flex;align-items:center;justify-content:space-between"><div class="si-num">'+s.shipment_number+'</div><span class="badge '+(s.status==="complete"?"bg":"by")+'">'+(s.status==="complete"?"Готово":"В работе")+'</span></div><div class="si-client">'+s.client_name+'</div><div class="si-meta">'+s.order_count+' позиций</div></div>').join('');
 }
 
-async function createOrder(){
-  const model=document.getElementById('nom').value,kits=document.getElementById('nok').value;
-  if(!model||!kits){alert('Заполните все поля');return;}
-  await api('/api/orders','POST',{model_id:parseInt(model),total_kits:parseInt(kits)});
-  document.getElementById('nok').value='';
-  showOrders();
+async function selectShipment(id){
+  const data=await api('/api/shipments/'+id);
+  curShip=data.shipment;
+  show('s-orders');
+  document.getElementById('so-title').textContent=curShip.shipment_number;
+  document.getElementById('so-sub').textContent=curShip.client_name;
+  const el=document.getElementById('order-list');
+  if(!data.orders.length){el.innerHTML='<div class="empty">Нет позиций в поставке</div>';return;}
+  el.innerHTML=data.orders.map(o=>{
+    const pct=o.total_kits>0?0:0;
+    return '<div class="oi" onclick="selectOrder('+o.id+',''+o.model_name+'','+o.total_kits+',''+o.order_number+'','+o.model_id+')"><div style="display:flex;align-items:center;justify-content:space-between"><div class="on">'+o.model_name+'</div><span class="badge '+(o.status==="complete"?"bg":"by")+'">'+(o.status==="complete"?"Готов":"В работе")+'</span></div><div class="om">'+o.total_kits+' комплектов &middot; '+o.order_number+'</div></div>';
+  }).join('');
 }
 
-async function selectOrder(id){
-  const orders=await api('/api/orders');
-  co=orders.find(o=>o.id===id);
-  show('sm');
-  document.getElementById('m-title').textContent=co.order_number;
-  document.getElementById('m-sub').textContent=co.model_name+' · '+co.total_kits+' комплектов';
+function selectOrder(id,name,kits,num,modelId){
+  curOrder={id,model_name:name,total_kits:kits,order_number:num,model_id:modelId};
+  showMode();
 }
 
-function showMode(){show('sm');}
+function showOrders(){selectShipment(curShip.id);}
+function showMode(){
+  show('s-mode');
+  document.getElementById('sm-title').textContent=curOrder.model_name;
+  document.getElementById('sm-sub').textContent=curShip.client_name+' · '+curOrder.total_kits+' компл.';
+}
 
 async function showKits(){
-  show('sk');
-  document.getElementById('kt').textContent=co.order_number;
-  document.getElementById('ksb').textContent=co.model_name;
-  const grid=document.getElementById('kg');
-  grid.innerHTML='<div class="loading">Загрузка...</div>';
-  const kd=await Promise.all(Array.from({length:co.total_kits},function(_,i){return api('/api/orders/'+co.id+'/kits/'+(i+1));}));
-  const done=kd.filter(k=>k.kit.status==='complete').length;
-  document.getElementById('st').textContent=co.total_kits;
-  document.getElementById('sd').textContent=done;
-  document.getElementById('sl2').textContent=co.total_kits-done;
-  grid.innerHTML=kd.map(function(k,i){return '<div class="kb '+(k.kit.status==='complete'?'complete':'')+'" onclick="showScan('+co.id+','+(i+1)+')"><div class="kn">'+(i+1)+'</div><div class="ks">'+(k.kit.status==='complete'?'Готов':k.progress+'/'+k.total)+'</div></div>';}).join('');
+  show('s-kits');
+  document.getElementById('sk-title').textContent=curOrder.order_number;
+  document.getElementById('sk-sub').textContent=curOrder.model_name;
+  const grid=document.getElementById('kits-grid');
+  grid.innerHTML='<div class="loading">...</div>';
+  const kd=await Promise.all(Array.from({length:curOrder.total_kits},(_,i)=>api('/api/orders/'+curOrder.id+'/kits/'+(i+1))));
+  const done=kd.filter(k=>k.kit&&k.kit.status==='complete').length;
+  document.getElementById('k-total').textContent=curOrder.total_kits;
+  document.getElementById('k-done').textContent=done;
+  document.getElementById('k-left').textContent=curOrder.total_kits-done;
+  grid.innerHTML=kd.map((k,i)=>'<div class="kb '+(k.kit&&k.kit.status==='complete'?'complete':'')+'" onclick="showScan('+curOrder.id+','+(i+1)+')"><div class="kn">'+(i+1)+'</div><div class="ks">'+(k.kit&&k.kit.status==='complete'?'&#10003;':k.progress+'/'+k.total)+'</div></div>').join('');
 }
 
 async function showScan(oid,kn){
   const data=await api('/api/orders/'+oid+'/kits/'+kn);
-  ck=data.kit;ap=data.parts;
-  show('ss');
-  document.getElementById('scti').textContent='Комплект '+kn;
-  document.getElementById('scs').textContent=co.order_number+' / '+co.model_name;
-  document.getElementById('cb').classList.toggle('show',data.kit.status==='complete');
+  curKit=data.kit;curParts=data.parts;
+  show('s-scan');
+  document.getElementById('sc-title').textContent='&#128230; '+kn;
+  document.getElementById('sc-sub').textContent=curOrder.model_name;
+  document.getElementById('scan-cb').classList.toggle('show',data.kit.status==='complete');
   renderCL(data.parts,data.progress,data.total);
-  document.getElementById('rb').classList.remove('show');
-  const inp=document.getElementById('sci');
-  inp.value='';inp.onchange=null;
-  inp.addEventListener('change',onScan);
-  setTimeout(function(){inp.focus();},100);
+  document.getElementById('scan-rb').classList.remove('show');
+  const inp=document.getElementById('scan-inp');
+  inp.value='';inp.onchange=null;inp.addEventListener('change',onScan);
+  setTimeout(()=>inp.focus(),100);
 }
 
 function renderCL(parts,prog,total){
-  var pct=total>0?Math.round(prog/total*100):0;
-  document.getElementById('pf').style.width=pct+'%';
-  document.getElementById('pt').textContent=prog+'/'+total;
-  document.getElementById('pcl').innerHTML=parts.map(function(p){return '<div class="pr"><div class="pc '+(p.scanned?'done':'')+'">'+(p.scanned?'v':'')+'</div><div><div class="pn '+(p.scanned?'done':'')+'">'+p.part_name+'</div><div class="pcd">'+p.part_code+'</div></div></div>';}).join('');
+  const pct=total>0?Math.round(prog/total*100):0;
+  document.getElementById('sc-pf').style.width=pct+'%';
+  document.getElementById('sc-prog').textContent=prog+'/'+total;
+  document.getElementById('sc-list').innerHTML=parts.map(p=>'<div class="pr"><div class="pc '+(p.scanned?'done':'')+'">'+(p.scanned?'&#10003;':'')+'</div><div><div class="pn '+(p.scanned?'done':'')+'">'+p.part_name+'</div><div class="pcd">'+p.part_code+'</div></div></div>').join('');
 }
 
 async function onScan(e){
   const code=e.target.value.trim();if(!code)return;e.target.value='';
-  const res=await api('/api/scan','POST',{kit_id:ck.id,part_code:code});
+  const res=await api('/api/scan','POST',{kit_id:curKit.id,part_code:code});
   if(res.result==='ok'){
-    showR('rb','r-ok','OK',res.part_name,res.progress+' из '+res.total+' деталей');
-    ap=ap.map(function(p){return p.part_code===code?Object.assign({},p,{scanned:true}):p;});
-    renderCL(ap,res.progress,res.total);
-    if(res.kit_complete)document.getElementById('cb').classList.add('show');
+    showR('scan-rb','r-ok','&#10003;',res.part_name,res.progress+'/'+res.total);
+    curParts=curParts.map(p=>p.part_code===code?{...p,scanned:true}:p);
+    renderCL(curParts,res.progress,res.total);
+    if(res.kit_complete)document.getElementById('scan-cb').classList.add('show');
   }else if(res.result==='wrong'){
-    showR('rb','r-wrong','ЧУЖАЯ',res.message,'');
+    showR('scan-rb','r-wrong','&#10005;','&#427987;&#1059;&#1046;&#1040;&#1071;!',res.message);
   }else{
-    showR('rb','r-dup','ДУБЛИКАТ',res.message,'');
+    showR('scan-rb','r-dup','!','&#1044;&#1059;&#1041;&#1051;&#1048;&#1050;&#1040;&#1058;',res.message);
   }
-  setTimeout(function(){document.getElementById('sci').focus();},100);
+  setTimeout(()=>document.getElementById('scan-inp').focus(),100);
 }
 
 async function showBatch(){
-  show('sb');
-  document.getElementById('bt').textContent='По деталям: '+co.order_number;
-  document.getElementById('bs').textContent=co.model_name+' · '+co.total_kits+' комплектов';
-  const models=await api('/api/models');
-  const model=models.find(m=>m.name===co.model_name||m.id===co.model_id);
-  const parts=await api('/api/models/'+co.model_id+'/parts');
-  batchParts=parts;
-  batchTotal=co.total_kits;
-  batchCounts={};
-  parts.forEach(p=>{batchCounts[p.part_code]=0;});
+  show('s-batch');
+  document.getElementById('bt-title').textContent='&#128290; '+curOrder.model_name;
+  document.getElementById('bt-sub').textContent=curShip.client_name+' · '+curOrder.total_kits+' компл.';
+  bParts=await api('/api/models/'+curOrder.model_id+'/parts');
+  bTotal=curOrder.total_kits;bCounts={};
+  bParts.forEach(p=>{bCounts[p.part_code]=0;});
   renderBatch();
-  document.getElementById('brb').classList.remove('show');
-  const inp=document.getElementById('bsi');
-  inp.value='';inp.onchange=null;
-  inp.addEventListener('change',onBatchScan);
-  setTimeout(function(){inp.focus();},100);
+  document.getElementById('batch-rb').classList.remove('show');
+  const inp=document.getElementById('batch-inp');
+  inp.value='';inp.onchange=null;inp.addEventListener('change',onBatch);
+  setTimeout(()=>inp.focus(),100);
 }
 
 function renderBatch(){
-  const total=batchParts.length*batchTotal;
-  const done=Object.values(batchCounts).reduce((a,b)=>a+b,0);
+  const total=bParts.length*bTotal,done=Object.values(bCounts).reduce((a,b)=>a+b,0);
   const pct=total>0?Math.round(done/total*100):0;
-  document.getElementById('bpf').style.width=pct+'%';
-  document.getElementById('bpt').textContent=done+'/'+total;
-  document.getElementById('bpl').innerHTML=batchParts.map(function(p){
-    const cnt=batchCounts[p.part_code]||0;
-    const cls=cnt>=batchTotal?'done':cnt>batchTotal?'over':'';
-    return '<div class="batch-row"><div class="batch-part"><div class="batch-name">'+p.part_name+'</div><div class="batch-code">'+p.part_code+'</div></div><div class="batch-counter"><div class="batch-num '+cls+'">'+cnt+'</div><div class="batch-needed">/ '+batchTotal+'</div></div></div>';
+  document.getElementById('bt-pf').style.width=pct+'%';
+  document.getElementById('bt-prog').textContent=done+'/'+total;
+  document.getElementById('bt-list').innerHTML=bParts.map(p=>{
+    const cnt=bCounts[p.part_code]||0,cls=cnt>=bTotal?'done':cnt>bTotal?'over':'';
+    return '<div class="batch-row"><div class="bp"><div class="bn">'+p.part_name+'</div><div class="bc">'+p.part_code+'</div></div><div class="bcount"><div class="bnum '+cls+'">'+cnt+'</div><div class="bneed">/ '+bTotal+'</div></div></div>';
   }).join('');
-  const allDone=batchParts.every(p=>(batchCounts[p.part_code]||0)>=batchTotal);
-  document.getElementById('bcb').classList.toggle('show',allDone);
+  document.getElementById('batch-cb').classList.toggle('show',bParts.every(p=>(bCounts[p.part_code]||0)>=bTotal));
 }
 
-async function onBatchScan(e){
+async function onBatch(e){
   const code=e.target.value.trim();if(!code)return;e.target.value='';
-  const part=batchParts.find(p=>p.part_code===code);
+  const part=bParts.find(p=>p.part_code===code);
   if(part){
-    const cnt=(batchCounts[code]||0)+1;
-    batchCounts[code]=cnt;
-    if(cnt<=batchTotal){
-      showR('brb','r-ok','OK',part.part_name,cnt+' из '+batchTotal+' шт');
-    }else{
-      showR('brb','r-dup','ЛИШНЯЯ',part.part_name,'Уже '+cnt+' шт — нужно только '+batchTotal);
-    }
+    const cnt=(bCounts[code]||0)+1;bCounts[code]=cnt;
+    if(cnt<=bTotal)showR('batch-rb','r-ok','&#10003;',part.part_name,cnt+'/'+bTotal);
+    else showR('batch-rb','r-dup','!','&#1051;&#1048;&#1064;&#1053;&#1045;&#1045;',part.part_name+' — '+cnt+' &#1096;&#1090;, &#1085;&#1072;&#1076;&#1086; '+bTotal);
     renderBatch();
   }else{
-    const allParts=await api('/api/models');
-    showR('brb','r-wrong','ЧУЖАЯ','Код: '+code,'Эта деталь не входит в '+co.model_name);
+    showR('batch-rb','r-wrong','&#10005;','&#427987;&#1059;&#1046;&#1040;&#1071; &#1044;&#1045;&#1058;&#1040;&#1051;&#1068;','&#1050;&#1086;&#1076;: '+code);
   }
-  setTimeout(function(){document.getElementById('bsi').focus();},100);
+  setTimeout(()=>document.getElementById('batch-inp').focus(),100);
 }
 
-function showR(boxId,cls,text,sub1,sub2){
-  const b=document.getElementById(boxId);
-  b.className='rb show '+cls;
-  document.getElementById(b.id.replace('b','')+'ri')||document.getElementById(boxId.replace('rb','rri'))||document.querySelector('#'+boxId+' .ri');
-  const ri=document.getElementById(boxId==='rb'?'rri':'brri');
-  const rt=document.getElementById(boxId==='rb'?'rrt':'brrt');
-  const rs=document.getElementById(boxId==='rb'?'rrs':'brrs');
-  ri.textContent=text==='OK'?'✓':text==='ЧУЖАЯ'?'✗':'!';
-  rt.textContent=text;
-  rs.textContent=sub1+(sub2?' — '+sub2:'');
-  setTimeout(function(){b.classList.remove('show');},4000);
+function showR(boxId,cls,icon,title,sub){
+  const b=document.getElementById(boxId);b.className='rb show '+cls;
+  const prefix=boxId==='scan-rb'?'sc':'bt';
+  document.getElementById(prefix+'-ri').textContent=icon;
+  document.getElementById(prefix+'-rt').textContent=title;
+  document.getElementById(prefix+'-rs').textContent=sub;
+  setTimeout(()=>b.classList.remove('show'),4000);
 }
 
-showOrders();
-</script>
-</body>
-</html>
+showShipments();
+</script></body></html>
