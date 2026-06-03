@@ -754,10 +754,11 @@
         </div>
         <div id="s6-list"></div>
       </div>
-      <div class="complete-banner" id="s6-done">
+<div class="complete-banner" id="s6-done">
         <div class="cb-icon">&#127881;</div>
         <div class="cb-title">Все детали собраны!</div>
-        <div class="cb-sub">Везите на упаковочный блок</div>
+        <div class="cb-sub">Проверьте количество и завершите сборку</div>
+        <button onclick="finishBatch()" style="margin-top:16px;width:100%;padding:16px;background:#22c55e;color:#fff;border:none;border-radius:14px;font-size:18px;font-weight:700;cursor:pointer">Завершить сборку &#10003;</button>
       </div>
     </div>
   </div>
@@ -1048,6 +1049,11 @@ function editBatch(partCode) {
       var ov=document.getElementById('qty-overlay');
       ov.style.display='flex';ov.style.flexDirection='column';ov.style.justifyContent='flex-end';
       setTimeout(function(){ document.getElementById('qp-input').focus(); },150);
+    } function finishBatch() {
+      var hasOver = bParts.some(function(p){ return (bCounts[p.part_code]||0) > bTotal; });
+      if (hasOver) { alert('Есть лишние детали! Исправьте перед завершением.'); return; }
+      alert('Сборка завершена! Заказ ' + curOrd.order_number + ' готов к погрузке.');
+      goS2();
     }
 
     var camInstances = {};
