@@ -973,7 +973,7 @@
         var cls = cnt > bTotal ? 'over' : cnt >= bTotal ? 'ok' : '';
         return '<div class="batch-row">'
           + '<div class="batch-part"><div class="batch-name">' + p.part_name + '</div><div class="batch-code">' + p.part_code + '</div></div>'
-          + '<div class="batch-cnt"><div class="batch-num ' + cls + '">' + cnt + '</div><div class="batch-need">/ ' + bTotal + '</div></div>'
+          + '<div class="batch-cnt"><div class="batch-num ' + cls + '">' + cnt + '</div><div class="batch-need">/ ' + bTotal + '</div><button onclick="editBatch(\'' + p.part_code + '\')" style="margin-left:8px;padding:4px 10px;background:#1a1d27;border:1px solid #2a2d3a;border-radius:8px;font-size:12px;color:#6b7280;cursor:pointer">✏️</button></div>'
           + '</div>';
       }).join('');
       var allDone = bParts.every(function (p) { return (bCounts[p.part_code] || 0) >= bTotal; });
@@ -1021,7 +1021,8 @@
       if (!pendingPart) return;
       var qty = parseInt(document.getElementById('qp-input').value);
       if (!qty || qty < 1) { document.getElementById('qp-input').focus(); return; }
-      var newCnt = (bCounts[pendingPart.part_code] || 0) + qty;
+      var isEdit = document.getElementById('qp-icon').textContent === 'edit';
+var newCnt = isEdit ? qty : (bCounts[pendingPart.part_code] || 0) + qty;
 if (newCnt > bTotal) { document.getElementById('qp-input').style.border = '2px solid #ef4444'; document.getElementById('qp-input').value = newCnt; alert('Лишних: ' + (newCnt - bTotal) + ' шт! Нужно ' + bTotal + ', взяли ' + newCnt); }
 bCounts[pendingPart.part_code] = newCnt;
       pendingPart = null;
@@ -1030,13 +1031,24 @@ bCounts[pendingPart.part_code] = newCnt;
       setTimeout(function () { document.getElementById('s6-inp').focus(); }, 100);
     }
 
-    function cancelQty() {
-      pendingPart = null;
-      document.getElementById('qty-overlay').style.display = 'none';
-      var activeInp = document.getElementById('s6-inp');
-      setTimeout(function () { if (activeInp) activeInp.focus(); }, 100);
+function editBatch(partCode) {
+      var part = bParts.find(function(p){ return p.part_code === partCode; });
+      if (!part) return;
+      pendingPart = part;
+      var current = bCounts[partCode] || 0;
+      document.getElementById('qp-icon').textContent = 'edit';
+      document.getElementById('qp-name').textContent = part.part_name;
+      document.getElementById('qp-code').textContent = 'Текущее: ' + current + ' шт — введи новое';
+      document.getElementById('qp-input').value = current;
+      document.getElementById('qp-input').style.border = '2px solid #f59e0b';
+      var vals = [1,2,3,5,bTotal].filter(function(v,i,a){ return v>0&&a.indexOf(v)===i; });
+      document.getElementById('qp-quick').innerHTML = vals.map(function(v){
+        return '<button onclick="setQty('+v+')" style="padding:12px 18px;background:#1a1d27;border:1px solid #2a2d3a;border-radius:10px;font-size:16px;color:#e8eaf0;cursor:pointer;min-width:52px">'+v+'</button>';
+      }).join('');
+      var ov=document.getElementById('qty-overlay');
+      ov.style.display='flex';ov.style.flexDirection='column';ov.style.justifyContent='flex-end';
+      setTimeout(function(){ document.getElementById('qp-input').focus(); },150);
     }
-
 
     var camInstances = {};
 
