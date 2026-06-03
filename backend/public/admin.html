@@ -312,13 +312,6 @@ async function loadOrders() {
 }
 
 async function createOrder(){const m=document.getElementById('o-model').value,k=document.getElementById('o-kits').value;if(!m||!k){alert_('o-alert','Заполните все поля','error');return;}const res=await api('/api/orders','POST',{model_id:parseInt(m),total_kits:parseInt(k)});document.getElementById('o-kits').value='';alert_('o-alert',res.order_number+' создан!');loadOrders();}
-  await api('/api/orders', 'POST', {order_number: num, model_id: parseInt(model), total_kits: parseInt(kits)});
-  document.getElementById('o-num').value = '';
-  document.getElementById('o-kits').value = '';
-  alert_('o-alert', 'Заказ ' + num + ' создан!');
-  loadOrders();
-}
-
 async function openOrderDetail(orderId) {
   const data = await api('/api/reports/order/' + orderId);
   document.getElementById('modal-order-title').textContent = 'Заказ ' + (data.order ? data.order.order_number : orderId);
