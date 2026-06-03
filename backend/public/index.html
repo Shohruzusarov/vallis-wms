@@ -52,7 +52,9 @@ input:focus,select:focus{outline:none;border-color:var(--bl)}
 .batch-row:last-child{border-bottom:none}.bp{flex:1}.bn{font-size:14px;font-weight:500}.bc{font-size:11px;color:var(--mt);font-family:monospace}
 .bcount{display:flex;align-items:center;gap:6px}.bnum{font-size:18px;font-weight:700;min-width:28px;text-align:center}
 .bnum.done{color:var(--gn)}.bnum.over{color:var(--rd)}.bneed{font-size:11px;color:var(--mt)}
-</style></head><body>
+</style>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head><body>
 
 <div id="s-ship" class="screen active">
   <div class="header"><div class="hl">V</div><div><div class="ht">Vallis WMS</div><div class="hs">Склад — поставки</div></div></div>
@@ -100,7 +102,12 @@ input:focus,select:focus{outline:none;border-color:var(--bl)}
   <div class="content">
     <div class="cb" id="scan-cb"><div class="ci">&#9989;</div><div class="ctl">Комплект полный!</div><div class="cs">Все детали — можно грузить</div></div>
     <div id="scan-rb" class="rb"><div class="ri" id="sc-ri"></div><div class="rt" id="sc-rt"></div><div class="rs" id="sc-rs"></div></div>
-    <div class="card" style="margin-bottom:12px"><div class="ct">Сканировать</div><input id="scan-inp" class="si" placeholder="QR пистолетом..." autocomplete="off" autocorrect="off" spellcheck="false"></div>
+    <div class="card" style="margin-bottom:12px">
+<div class="ct">Сканировать</div>
+<input id="scan-inp" class="si" placeholder="QR пистолетом..." autocomplete="off" autocorrect="off" spellcheck="false">
+<button onclick="toggleCamera('scan')" id="cam-btn-scan" style="width:100%;margin-top:8px;padding:12px;background:#1e3a5f;color:#60a5fa;border:1px solid #2563eb;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer">📷 Сканировать камерой</button>
+<div id="cam-reader-scan" style="margin-top:8px;border-radius:12px;overflow:hidden;display:none"></div>
+</div>
     <div class="card"><div class="ct">Детали <span id="sc-prog" style="color:var(--tx);font-weight:600"></span></div><div class="pb" style="margin-bottom:12px"><div class="pf" id="sc-pf" style="width:0%"></div></div><div id="sc-list"></div></div>
   </div>
 </div>
@@ -109,7 +116,12 @@ input:focus,select:focus{outline:none;border-color:var(--bl)}
   <div class="header"><div class="hl">V</div><div><div class="ht" id="bt-title">По деталям</div><div class="hs" id="bt-sub"></div></div><button class="hb" onclick="showMode()">&#8592; Назад</button></div>
   <div class="content">
     <div id="batch-rb" class="rb"><div class="ri" id="bt-ri"></div><div class="rt" id="bt-rt"></div><div class="rs" id="bt-rs"></div></div>
-    <div class="card" style="margin-bottom:12px"><div class="ct">Сканировать</div><input id="batch-inp" class="si" placeholder="QR пистолетом..." autocomplete="off" autocorrect="off" spellcheck="false"></div>
+    <div class="card" style="margin-bottom:12px">
+<div class="ct">Сканировать</div>
+<input id="batch-inp" class="si" placeholder="QR пистолетом..." autocomplete="off" autocorrect="off" spellcheck="false">
+<button onclick="toggleCamera('batch')" id="cam-btn-batch" style="width:100%;margin-top:8px;padding:12px;background:#1e3a5f;color:#60a5fa;border:1px solid #2563eb;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer">📷 Сканировать камерой</button>
+<div id="cam-reader-batch" style="margin-top:8px;border-radius:12px;overflow:hidden;display:none"></div>
+</div>
     <div class="card"><div class="ct">Прогресс <span id="bt-prog" style="color:var(--tx);font-weight:600"></span></div><div class="pb" style="margin-bottom:12px"><div class="pf" id="bt-pf" style="width:0%"></div></div><div id="bt-list"></div></div>
     <div class="cb" id="batch-cb"><div class="ci">&#127881;</div><div class="ctl">Все детали собраны!</div><div class="cs">Везите на упаковку</div></div>
   </div>
@@ -255,6 +267,56 @@ function showR(boxId,cls,icon,title,sub){
   document.getElementById(prefix+'-rt').textContent=title;
   document.getElementById(prefix+'-rs').textContent=sub;
   setTimeout(()=>b.classList.remove('show'),4000);
+}
+
+
+let cameras = {};
+
+async function toggleCamera(mode) {
+  const readerId = 'cam-reader-' + mode;
+  const btnId = 'cam-btn-' + mode;
+  const reader = document.getElementById(readerId);
+  const btn = document.getElementById(btnId);
+
+  if (cameras[mode]) {
+    await cameras[mode].stop();
+    cameras[mode] = null;
+    reader.style.display = 'none';
+    btn.textContent = '📷 Сканировать камерой';
+    return;
+  }
+
+  reader.style.display = 'block';
+  btn.textContent = '⏹ Остановить камеру';
+  reader.innerHTML = '';
+
+  const qr = new Html5Qrcode(readerId);
+  cameras[mode] = qr;
+
+  try {
+    await qr.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      async (code) => {
+        await qr.stop();
+        cameras[mode] = null;
+        reader.style.display = 'none';
+        btn.textContent = '📷 Сканировать камерой';
+        if (mode === 'scan') {
+          document.getElementById('scan-inp').value = code;
+          document.getElementById('scan-inp').dispatchEvent(new Event('change'));
+        } else {
+          document.getElementById('batch-inp').value = code;
+          document.getElementById('batch-inp').dispatchEvent(new Event('change'));
+        }
+      },
+      () => {}
+    );
+  } catch(e) {
+    reader.innerHTML = '<div style="padding:12px;color:#ef4444;font-size:13px">Ошибка камеры: ' + e + '</div>';
+    cameras[mode] = null;
+    btn.textContent = '📷 Сканировать камерой';
+  }
 }
 
 showShipments();
